@@ -1,0 +1,18 @@
+<%perl>
+    my $dbh = Baseliner->model('Harvest')->storage->dbh;
+    my $stmt = $dbh->prepare( 'select * from haruser' );
+    $stmt->execute;
+        while( my @ROW = $stmt->fetchrow_array ) {
+            #print join',',@ROW;
+        }
+        $stmt->finish;
+
+    use Baseliner::Core::DBI;
+    my $db = Baseliner::Core::DBI->new({ model=>'Harvest' });
+    print join',',$db->array('select * from harenvironment');
+
+    # this will fail:
+    #  $db->do("insert into harenvironment (environmentname) values ('aaa')");
+
+
+</%perl>

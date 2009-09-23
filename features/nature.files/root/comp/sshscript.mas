@@ -1,0 +1,215 @@
+<%args>
+	$filedistGridId => 'fileDistGrid',
+</%args>
+(function(theForm){
+    // shorthand alias
+    var gridFD = <% $filedistGridId %>;
+
+    var fm = Ext.form;      
+    var cm = new Ext.grid.ColumnModel([
+    	{
+           id:'script',
+           header: "Script",
+           dataIndex: 'script',
+           width: 200
+        },
+    	{
+           id:'params',
+           header: "Parametros",
+           dataIndex: 'params',
+           width: 200
+        },        
+    	{
+           id:'ssh_host',
+           header: "SSH user@host",
+           dataIndex: 'ssh_host',
+           width: 100
+        },  
+    	{
+           id:'xorder',
+           header: "Orden",
+           dataIndex: 'xorder',
+           width: 50
+        }                     
+        ]);
+
+   // by default columns are sortable
+    cm.defaultSortable = true;
+
+    // this could be inline, but we want to define the Plant record
+    // type so we can add records dynamically
+    var rec = Ext.data.Record.create([
+           {name: 'id', type: 'string'},
+           {name: 'ns', type: 'string'},
+           {name: 'bl', type: 'string'},
+           {name: 'script', type: 'string'},
+           {name: 'params', type: 'string'},
+           {name: 'ssh_host', type: 'string'},
+           {name: 'xorder', type: 'string'}
+      ]);
+
+    // create the Data Store
+	var store = new Ext.data.JsonStore({
+		url: '<% $c->stash->{url_script_store} %>',
+		root:'data',	
+		fields: [ 
+           {name: 'id', type: 'string'},
+           {name: 'ns', type: 'string'},
+           {name: 'bl', type: 'string'},
+           {name: 'script', type: 'string'},
+           {name: 'params', type: 'string'},
+           {name: 'ssh_host', type: 'string'},
+           {name: 'xorder', type: 'string'}
+		]
+	});
+	
+	
+
+	var fdSelMod = new Ext.grid.RowSelectionModel({singleSelect:true}); 
+	fdSelMod.addListener('rowselect', 
+              function (grid, rowIndex, e){                                          
+					var record = fdSelMod.getSelected();	
+					store.load({params:{fid:fdSelMod.getSelected().data.id}});					
+					return record;
+				});   	
+
+	gridFD.selModel = fdSelMod;
+	gridFD.store.on("remove",function(st,record,index){store.removeAll();});
+
+	var rowSelMod = new Ext.grid.RowSelectionModel({singleSelect:true}); 
+	rowSelMod.addListener('rowselect', 
+              function (grid, rowIndex, e){                                          
+					var record = rowSelMod.getSelected();
+					return record;
+				});   	
+	
+    // create the editor grid
+    var grid = new Ext.grid.GridPanel({
+    	id: 'scripts',
+    	name: 'scripts[]',
+        store: store,
+        cm: cm,
+        sm: rowSelMod,
+        width: 750,
+        height: 200,
+        title:'Scripts',
+        frame:true,
+
+        tbar: [{
+            text: 'Insertar Script',
+            icon: '/static/images/drop-add.gif',
+           	cls: 'x-btn-text-icon',
+            handler : function(){
+            	win.setTitle('Nuevo mapeo de ficheros');
+            	var selectedRecord = gridFD.getSelectionModel().getSelected();
+            	if(selectedRecord != null){
+            		var xForm = getFormScripts().getForm();
+            		var value = selectedRecord.data.id;
+                	win.show();
+                	xForm.reset();
+            		xForm.setValues({fid:value});
+                }else{
+	                Ext.MessageBox.show({  
+				                     title: 'Error al crear script',  
+				                     msg: 'Debe seleccionar antes un mapeo.',  
+				                     buttons: Ext.MessageBox.OK,  
+				                     icon: Ext.MessageBox.ERROR  
+				                 });  
+                }
+            }},
+            {
+            text: 'Editar Script',
+            icon: '/static/images/drop-yes.gif',
+           	cls: 'x-btn-text-icon',
+            handler : function(){
+            	win.setTitle('Editar mapeo seleccionado');
+            	var selectedRecord = grid.getSelectionModel().getSelected();
+            	getFormScripts().getForm().loadRecord(selectedRecord);
+                //añadir al grid y submit
+                win.show();
+            }},
+                        
+            {
+            text: 'Eliminar Script',
+            icon: '/static/images/del.gif',
+           	cls: 'x-btn-text-icon',
+ 			handler : function(){     
+                var selectedRecord = grid.getSelectionModel().getSelected();
+                grid.el.mask('Actualizando', 'x-mask-loading');
+			
+			    Ext.Ajax.request({
+			        url    : '<% $c->stash->{url_script_delete} %>',
+			        params :  {
+			            id  : selectedRecord.data.id
+			        },
+			        success : function() {
+			            grid.getStore().remove(selectedRecord);
+			            grid.el.unmask();
+			        }
+			    });
+            }
+        }]
+    });
+
+    // trigger the data store load
+    store.load();
+    
+  
+    theForm.add(grid);
+
+
+      var formScripts = new Ext.FormPanel( {
+                 border    : false,
+                 frame		: true,
+                 url      : '<% $c->stash->{url_script_submit} %>',
+                 items     : <& /comp/config_form.mas, metadataKey => 'metadata_sshscript' &>
+             }
+        );      
+        
+		//creamos la ventana que contendrá el formulario  
+		var win = new Ext.Window({  
+		    title: 'Nuevo Script',  
+		    width:450,  
+		    height:450, 
+		    closeAction: "hide",
+		    layout: 'fit',
+		    resizable: false,
+		    items:formScripts, //le asignamos el formulario solamente  
+		    buttonAlign: 'right', //botones alineados a la derecha  
+		    buttons:[{
+		    	text:'Guardar',
+			     handler : function() {  
+			         formScripts.getForm().submit({  
+			             waitMsg : 'Salvando datos...',  
+			             failure: function (form, action) {  
+			                 Ext.MessageBox.show({  
+			                     title: 'Error al salvar los datos',  
+			                     msg: 'Error al salvar los datos.',  
+			                     buttons: Ext.MessageBox.OK,  
+			                     icon: Ext.MessageBox.ERROR  
+			                 });  
+			             },  
+			             success: function (form, request) {  
+			                 Ext.MessageBox.show({  
+			                     title: 'Datos salvados correctamente',  
+			                     msg: 'Datos salvados correctamente',  
+			                     buttons: Ext.MessageBox.OK,  
+			                     icon: Ext.MessageBox.INFO  
+			                 });
+			                 store.load({params:{fid:gridFD.getSelectionModel().getSelected().data.id}});  
+			                 win.hide();
+			             }  
+			         });  
+			     }
+			     }	    	
+		    	,
+		    	{
+		    	text:'Cancelar', 
+		    	handler: function(){win.hide();}
+		    	}] //botones del formulario  
+		}); 
+		
+      function getFormScripts(){ return formScripts;}
+     	
+	return grid;
+});

@@ -1,0 +1,5 @@
+<script>
+
+    Baseliner.message( "<% $c->stash->{title} || _loc('Message') %>", "<% $c->stash->{message} %>");
+
+</script>

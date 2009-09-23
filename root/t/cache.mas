@@ -1,0 +1,13 @@
+<%perl>
+    
+    my $cache = Baseliner->cache( backend=>'endevor');
+    my $cache2 = Baseliner->cache( backend=>'job_items');
+    use DateTime;
+    $cache->set( 'ts', DateTime->now );
+    $cache2->set( 'ts', "aa" . DateTime->now );
+
+</%perl>
+<pre>
+% print $cache->get( 'ts' );
+<p>
+% print $cache2->get( 'ts' );

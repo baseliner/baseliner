@@ -1,0 +1,44 @@
+(function(){
+      var form = new Ext.FormPanel( {
+                 frame    : true,
+                 url      : '<% $c->stash->{url_submit} %>',
+                 width    : <% $c->stash->{width} || 350 %>,
+                 items     :  <& /comp/config_form.mas &>
+             }
+        );
+      form.getForm().load({
+             url:  '<% $c->stash->{url_store} %>'
+      });
+      
+      var tb = new Ext.Toolbar({
+             id: 'formtb',
+             items: [ 
+             '<% $c->stash->{title} %>',
+              '->',
+             { xtype:'button', text: 'Guardar', handler: function(){ 
+             		Baseliner.formSubmit(form.getForm())} 
+             		},
+             { xtype:'button',text:'Restablecer', handler: function() { form.getForm().reset() }  }
+             ] 
+      });
+      
+ 	      
+  	  var createFileDistGrid = <&  '/comp/filedist.mas' &>
+  	  var fileDistGrid = createFileDistGrid(form);
+  
+      form.add(fileDistGrid);
+      
+  	  var createScriptGrid = <&  '/comp/sshscript.mas', filedistGridId=>'fileDistGrid' &>
+  	  var scriptGrid = createScriptGrid(form);
+  
+      form.add(scriptGrid);      
+      		      
+      var panel = new Ext.Panel({
+             layout: 'fit' , border: 0 , tbar: tb, items: [ form  ] 
+      });
+      return panel;
+})();
+<%init>
+          use JavaScript::Dumper;
+</%init>
+ 

@@ -1,0 +1,14 @@
+<%init>
+    use Encode qw/is_utf8 encode decode encode_utf8 decode_utf8/;
+</%init>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<body>
+    ááéé
+    <% 'ááá' %> 
+% my $rs =$c->model('Baseliner::BaliJob')->search();
+% while( my $r = $rs->next ) {
+    <% _loc_raw( $r->status ) %>
+% }
+
+</body>
+

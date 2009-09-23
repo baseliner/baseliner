@@ -1,0 +1,12 @@
+% $m->call_next;
+<%once>
+	use Encode qw( encode_utf8 is_utf8 decode );
+	use Baseliner::Utils;
+	use JavaScript::Dumper;
+</%once>
+<%filter>
+	# Convert from characters to bytes if necessary.
+	# Original method:
+    $_ = encode_utf8( $_ ) if is_utf8( $_ );
+	# $_ = is_utf8($_) ? encode_utf8( $_ ) : encode_utf8(decode('iso-8859-1', $_));
+</%filter>

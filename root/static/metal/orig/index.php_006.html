@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="ageye GBR" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<title>ageye.de: Software und Spiele f&uuml;r Windows Mobile</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/prototype.js"></script>
+<script type="text/javascript" src="js/scriptaculous.js?load=effects,builder"></script>
+<script type="text/javascript" src="js/lightbox.js"></script>
+<link rel="stylesheet" href="css/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript"> <!--
+function Find()
+{
+	if (document.getElementById("uncrypt"))
+	{
+		var temp = Un(document.getElementById("uncrypt").title);
+		document.getElementById("uncrypt").innerHTML = '<a href="' + temp + '">' + temp.replace( /mailto:/, ''); + '</a>';
+		document.getElementById("uncrypt").title = temp.replace( /mailto:/, '');
+	}
+}
+function Un( s )
+{
+	var n = 0;
+	var r = "";
+	for( var i = 0; i < s.length; i++)
+	{
+		n = s.charCodeAt( i );
+		if( n >= 8364 )
+		{
+			n = 128;
+		}
+		r += String.fromCharCode( n - 1 );
+	}
+	return r;
+}
+
+function MUn( s )
+{
+	location.href=Un( s );
+}
+// --> </script>
+</head>
+
+<body onload="Find()">
+<div id="container">
+	<div id="head">
+    	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+        	<tr><td align="right" style="padding-top: 5px; padding-right: 5px;">			<a href="index.php?s=contact&l=en"><img src="gfx/sections/common/flag_en.png" border="0" title="english" alt="english" /></a> <a href="index.php?s=contact&l=en">English</a> <a href="index.php?s=contact&l=en"><img src="gfx/sections/common/flag_de.png" border="0" title="german" alt="german" /></a> <a href="index.php?s=contact&l=de">Deutsch</a></td></tr>
+            <tr>
+            	<td valign="top"><div id="logo"><img src="gfx/logo.png" alt="ageye" title="ageye" border="0" /></div></td>
+            </tr>
+        </table>
+    </div>
+    <div id="menu"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr height="63"><td><span id="menu_item"><a href="index.php?s=home" class="menu_item_nsel">Startseite</a></span><span id="menu_item"><a href="index.php?s=products" class="menu_item_nsel">Produkte</a></span><span id="menu_item"><a href="index.php?s=shop" class="menu_item_nsel">Shop</a></span><span id="menu_item"><a href="index.php?s=download" class="menu_item_nsel">Downloads</a></span><span id="menu_item"><a href="index.php?s=contact" class="menu_item_sel">Kontakt</a></span></td><td align="right"><form action="index.php" method="get"><input type="hidden" name="s" value="search" /><input id="styled_search" type="text" name="search" value="Suche" onFocus="if (this.value=='Suche') { this.value = ''; };this.className='selected';" onBlur="this.className='';if (this.value=='') { this.value = 'Suche'; };" onSelect="this.className='selected';if (this.value=='Suche') { this.value = ''; };" style="margin-right: 20px;" /></form></td></tr></table></div>
+	<div style="height: 15px"></div>            <div id="content_top"></div>
+	<div id="content_bg">
+		<div id="content"><div id="content_text"><p><img src="gfx/sections/common/icon_contact_de.png" border="0" title="Contact" alt="Contact" /></p>
+<p>Wenn Sie Schwierigkeiten in der Bedienung unserer Software haben oder einen Fehler gefunden haben, bitten wir Sie erst, die Handb&uuml;cher der einzelnen Produkte zu lesen:</p>
+<ul>
+  <li><a href="index.php?s=galarm/support/manual">G-Alarm Handbuch (englisch)</a></li>
+  <li><a href="index.php?s=gprofile/support/manual">G-Profile Handbuch (englisch)</a></li>
+</ul>
+<p>Sollten Sie dort keine hilfreiche Informationen finden, empfehlen wir Ihnen, unser <a href="http://forum.ageye.de" target="_blank">Forum</a> (englisch) danach zu durchsuchen und gegebenenfalls einen neuen Beitrag zu erstellen. Dort erhalten Sie erfahrungsgem&auml;&szlig; am schnellsten Hilfe.</p>
+<p><img src="gfx/sections/common/attention.png" border="0" align="absmiddle" /> Weiterhin lohnt sich ein Blick in unsere <a href="index.php?s=shop/faq">H&auml;ufig gestellte Fragen</a>.</p>
+<p>Sie k&ouml;nnen uns gerne auch per E-Mail, v.a. bei Problemen mit dem Zahlungsverkehr oder der Registrierung, mithilfe dieses Kontaktformulars erreichen.</p>
+<div id="contact" style="margin-left:10px;">
+<form action="index.php?s=contact&post=true" method="post" name="contactform">
+<table border="0" cellpadding="4">
+<tr><td><strong>Ihr Name:</strong></td></tr>
+<tr><td><input type="text" name="name" value="" onFocus="this.className='selected'" onBlur="this.className=''" onSelect="this.className='selected'" /></td></tr>
+<tr><td><strong>E-Mail Adresse:</strong></td></tr>
+<tr><td><input type="text" name="email" value="" onFocus="this.className='selected'" onBlur="this.className=''" onSelect="this.className='selected'" /></td></tr>
+<tr><td><strong>Ihre Nachricht:</strong></td></tr>
+<tr><td>
+<span id="textareaSpan"><textarea name="message" onFocus="document.getElementById('textareaSpan').className='selected'" onBlur="document.getElementById('textareaSpan').className=''" onSelect="document.getElementById('textareaSpan').className='selected'"></textarea>
+</span>
+<div id="submit_de" onMouseMove="this.className='selected'" onMouseOut="this.className=''" onclick="document.contactform.submit();">&nbsp;</div></td></tr>
+</table>
+</form>
+</div>
+</div>
+		</div>
+	</div>
+	<div id="content_bottom"></div>
+        <div id="footer"><a href="index.php?s=termsandconditions">AGB</a> | <a href="index.php?s=returnpolicy">Widerrufsrecht</a> | <a href="index.php?s=privacypolicy">Datenschutzrichtlinien</a> | <a href="index.php?s=imprint">Impressum</a> | <a href="index.php?s=shop/faq">H&auml;ufig gestellte Fragen</a> | <a href="index.php?s=partner">Partner</a> | <a href="index.php?s=shop/status">Bestellstatus</a> | <a href="http://forum.ageye.de" target="_blank">Forum</a><br />&copy; 2009 ageye GbR</div>
+</div>
+</body>
+</html>

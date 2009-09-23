@@ -1,0 +1,5 @@
+<pre>
+<%perl>
+    use YAML;
+    print Dump $c->model('Messaging')->inbox(username=>$c->user->username, message_type=>'instant', all=>1 );
+</%perl>

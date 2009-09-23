@@ -1,0 +1,424 @@
+@charset "utf-8";
+
+#metal-div_main {
+	font-family: Verdana, Helvetica, Arial;
+	font-size: 12px;
+	line-height: 1.5;
+	padding:0;
+	margin:0;
+    _height: '100%';
+	background-image: url('/static/metal/body_bg.png');
+	background-repeat:repeat-x;
+}
+
+/* RG: fix for the IE6 png transparency problem */
+#metal-div_main div, img { _behavior: url(/static/metal/iepngfix.htc) } 
+
+#metal-container {
+	width: 990px;
+	margin: 0 auto;
+    _margin: 0 auto auto auto;
+	background-image: url(/static/metal/container_bg.png);
+	background-repeat: no-repeat;
+}
+
+#metal-head {
+	width: 958px;
+	margin: 0 auto;
+	height: 128px;
+}
+
+#metal-menu {
+	width: 958px;
+	margin: 0 auto;
+	height: 63px;
+	background-image:url(/static/metal/menu_bg.png);
+	background-repeat:no-repeat;
+	line-height: 63px;
+}
+
+#metal-menu_item {
+	padding-left: 20px;
+	padding-right: 20px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+a.menu_item_nsel {
+	text-decoration: none;
+	color: #646464;
+}
+
+#metal-menu_item a:hover, a.menu_item_sel {
+	text-decoration: none;
+	color: #FFFFFF;
+}
+
+#metal-submenu_item {
+	padding-left: 20px;
+	padding-right: 20px;
+	font-size: 12px;
+}
+
+#metal-div_main a.submenu_item_nsel {
+	text-decoration: none;
+	color: #8d8b8b;
+}
+
+#metal-submenu_item a:hover, a.submenu_item_sel {
+	text-decoration: underline;
+	color: #444444;
+}
+
+
+#metal-title {
+	width: 958px;
+	margin: 0 auto;
+	height: 67px;
+}
+
+#metal-submenu {
+	width: 958px;
+	margin: 0 auto;
+	height: 63px;
+	line-height: 63px;
+}
+
+#metal-logo {
+	margin-top: -1px;
+	margin-left: 10px;
+}
+
+#metal-content_products {
+	height: 22px;
+	width: 958px;
+	margin: 0 auto;
+}
+
+#metal-content_top {
+	background-image:url(/static/metal/content_bg_toptop.png);
+	background-repeat:no-repeat;
+	height: 22px;
+	width: 958px;
+	margin: 0 auto;
+}
+
+#metal-content_bottom {
+	background-image:url(/static/metal/content_bg_bottom.png);
+	background-repeat:no-repeat;
+	height: 22px;
+	width: 958px;
+	margin: 0 auto;
+}
+
+
+#metal-content {
+	min-height: 560px;
+	_height: 560px;
+	background-image:url(/static/metal/content_bg_top.png);
+	background-repeat:no-repeat;
+	width: 958px;
+	padding: 0px;
+	color: #424242;
+}
+
+#metal-content_text {
+	padding-top: 20px;
+	padding-left: 50px;
+	padding-right: 50px;
+	padding-bottom: 20px;
+}
+
+#metal-content a {
+	text-decoration: none;
+	color: #159ec5;
+}
+
+#metal-content a:hover {
+	text-decoration: underline;
+}
+
+#metal-content a.blacka {
+	color: #000000;
+	text-decoration: none;
+}
+
+#metal-content_bg {
+	min-height: 560px;
+	_height: 560px;
+	background-image:url(/static/metal/content_bg.png);
+	background-repeat: repeat-y;
+	width: 958px;
+	padding: 0;
+	margin: 0 auto;
+}
+
+#metal-products_small {
+	background-image:url(/static/metal/products_small_bg.png);
+	background-repeat:no-repeat;
+	width: 298px;
+	height: 207px;
+	margin-bottom: 20px;
+	padding: 0px;
+	cursor: pointer;
+}
+
+.products_small_left {
+	margin-left: 0px;
+	margin-right: 31px;
+}
+
+.products_small_right {
+	margin-left: 32px;
+	margin-right: 0px;
+}
+
+#metal-products_big {
+	background-image:url(/static/metal/products_big_bg.png);
+	background-repeat:no-repeat;
+	width: 958px;
+	margin: 0 auto 20px;
+	min-height: 327px;
+	_height: 327px;
+	cursor: pointer;
+}
+
+#metal-products_big_content {
+	background-image:url(/static/metal/sections/products_big/galarm.png);
+	background-repeat:no-repeat;
+	width: 958px;
+	min-height: 327px;
+	_height: 327px;
+	color: #ffffff;
+	font-size: 11px;
+	line-height: 1.3;
+}
+
+#metal-products_big_content a {
+	font-size: 13px;
+	font-weight: bold;
+	text-decoration: underline;
+	font-style: italic;
+}
+
+#metal-products_big_box {
+	background-image:url(/static/metal/sections/products_big/box.png);
+	background-repeat:no-repeat;
+	width: 410px;
+	height: 165px;
+	position: relative;
+	left: 470px;
+	top: 50px;
+	text-align: left;
+	padding: 20px;
+}
+
+#metal-products_big_logo {
+	position: relative;
+	top: 30px;
+}
+
+#metal-footer {
+	height: 63px;
+	width: 958px;
+	margin: 0 auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	text-align: center;
+	color: #888888;
+}
+
+#metal-footer a {
+	color: #159EC5;
+}
+
+#metal-download {
+	width: 150px;
+	height: 49px;
+	background-image:url(//static/metal/button.png);
+	background-repeat:no-repeat;
+	line-height: 49px;
+	font-size: 14px;
+	color: #FFFFFF;
+	font-weight: bold;
+	text-align: center;
+	cursor: pointer;
+}
+
+#metal-download a, #buy a {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+#metal-buy {
+	width: 150px;
+	height: 49px;
+	background-image:url(//static/metal/buy.png);
+	background-repeat:no-repeat;
+	line-height: 49px;
+	font-size: 14px;
+	color: #FFFFFF;
+	font-weight: bold;
+	text-align: center;
+	margin-left: 30px;
+	cursor: pointer;
+}
+
+#metal-contact input, #styled {
+	background:transparent url(/static/metal/inputfield.png) no-repeat scroll 1px 0;
+	border:0 none;
+	height:18px;
+	line-height:1em;
+	padding:8px 12px 3px 6px;
+	width:189px;
+	font-family: Verdana, Helvetica, Arial;
+	font-size: 12px;
+	color: #000000;
+}
+
+#metal-contact input.selected, #styled.selected {
+	background-position: 1px -29px;
+}
+
+#metal-contact input:focus, #styled:focus {
+	outline-color: -moz-use-text-color;
+	outline-style: none;
+	outline-width: medium;
+}
+
+#metal-styled_search {
+	background:transparent url(/static/metal/searchfield.png) no-repeat scroll 1px 0;
+	border:0 none;
+	height:18px;
+	line-height:1em;
+	padding:8px 40px 3px 8px;
+	width:126px;
+	font-family: Verdana, Helvetica, Arial;
+	font-size: 12px;
+	font-weight: bold;
+	color: #757575;
+}
+
+#metal-styled_search.selected {
+	background-position: 1px -29px;
+	color: #FFFFFF;
+}
+
+#metal-styled_search:focus {
+	outline-color: -moz-use-text-color;
+	outline-style: none;
+	outline-width: medium;
+}
+
+#metal-contact textarea {
+	background:transparent none no-repeat scroll 0 0;
+	border:0 none;
+	height:201px;
+	overflow: auto;
+	padding:8px 6px;
+	width:417px;
+	font-family: Verdana, Helvetica, Arial;
+	font-size: 12px;
+	color: #000000;
+}
+
+#metal-contact span {
+	background:transparent url(/static/metal/textfield.png) no-repeat scroll 1px 0;
+	float: left;
+	height:217px;
+	width:429px;
+	margin: 0;
+	padding: 0;
+}
+
+#metal-contact span.selected {
+	background-position: 1px -217px;
+}
+
+#metal-contact span:focus {
+	outline-color: -moz-use-text-color;
+	outline-style: none;
+	outline-width: medium;
+}
+
+#metal-contact #submit_de {
+	background:transparent url(/static/metal/send_de.png) no-repeat scroll 0 0;
+	border:0 none;
+	float:left;
+	height:32px;
+	line-height:1em;
+	padding:8px 6px 0;
+	width:429px;
+	cursor: pointer;
+}
+
+#metal-contact #submit_en {
+	background:transparent url(/static/metal/send_en.png) no-repeat scroll 0 0;
+	border:0 none;
+	float:left;
+	height:32px;
+	line-height:1em;
+	padding:8px 6px 0;
+	width:429px;
+	cursor: pointer;
+}
+
+#metal-contact #submit_de.selected, #contact #submit_en.selected {
+	background-position: 0 -41px;
+}
+/*----Text Formatierung-START----*/
+
+#metal-div_main td.content_text {
+	padding-left: 5px;
+}
+
+#metal-div_main p {
+	/*margin: 0px;*/
+	padding-left: 5px;
+}
+
+#metal-div_main h1 {
+	font-size: 15px;
+	color: #424242;
+	padding-bottom: 3px;
+	padding-left: 5px;
+}
+
+#metal-div_main h2 {
+	font-size: 13px;
+	color: #424242;
+	padding-bottom: 3px;
+	padding-left: 5px;
+}
+
+#metal-div_main a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+#metal-div_main a:hover {
+	text-decoration: underline;
+}
+
+.small {
+	font-size: 10px;
+}
+
+.big {
+	font-size: 14px;
+}
+
+#metal-error {
+	margin: 5px;
+	color: #FF0000;
+	font-weight: bold;
+}
+
+.underline {
+ text-decoration: underline;
+}
+
+.hover {
+	color: #19c114;
+}
+

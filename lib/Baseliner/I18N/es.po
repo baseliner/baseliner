@@ -1,0 +1,677 @@
+﻿msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Baseliner"
+msgstr "Distribuidor"
+
+msgid "About..."
+msgstr "Acerca de..."
+
+msgid "About Baseliner"
+msgstr "Acerca de Distribuidor"
+
+msgid "Filter"
+msgstr "Filtro"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Login Failed"
+msgstr "Login Inválido"
+
+msgid "Invalid User or Password"
+msgstr "Usuario o Contraseña inválidas"
+
+msgid "Missing User or Password"
+msgstr "Falta el usuario y/o contraseña"
+
+msgid "Logout"
+msgstr "Desconectar"
+
+msgid "Step"
+msgstr "Paso"
+
+msgid "Step %1 finished"
+msgstr "Paso %1 finalizado"
+
+msgid "PRE"
+msgstr "Pre-Ejecución"
+
+msgid "RUN"
+msgstr "Ejecución"
+
+msgid "POST"
+msgstr "Post-Ejecución"
+
+msgid "END"
+msgstr "Detenido"
+
+msgid "Preferences"
+msgstr "Preferencias"
+
+msgid "Main"
+msgstr "Principal"
+
+msgid "Application"
+msgstr "Aplicación"
+
+msgid "Nature"
+msgstr "Naturaleza"
+
+msgid "Natures"
+msgstr "Naturalezas"
+
+msgid "Calendar"
+msgstr "Calendario"
+
+msgid "Searching..."
+msgstr "Buscando"
+
+msgid "Failure"
+msgstr "Error"
+
+msgid "Update"
+msgstr "Actualizar"
+
+msgid "Namespace"
+msgstr "Ámbito"
+
+msgid "Namespaces"
+msgstr "Ámbitos"
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "Preference"
+msgstr "Preferencias"
+
+msgid "User Preferences"
+msgstr "Preferencias de Usuario"
+
+msgid "Login Error"
+msgstr "Error de Login"
+
+msgid "Invalid User."
+msgstr "Usuario Inválido."
+
+msgid "User '%1' not found." 
+msgstr "Usuario '%1' no encontrado."
+
+msgid "Configuration Items"
+msgstr "Elementos de Configuración"
+
+msgid "Config Matrix"
+msgstr "Matriz de Configuración"
+
+msgid "Field already in the form: "
+msgstr "Campo ya está en formulario: "
+
+msgid "Form data saved"
+msgstr "Formulario guardado"
+
+msgid "Infrastructure"
+msgstr "Infraestructura"
+
+msgid "Common"
+msgstr "Común"
+
+msgid "Approve"
+msgstr "Aprobar"
+
+msgid "Approval"
+msgstr "Aprobación"
+
+msgid "Pending Approval"
+msgstr "Pendiente de Aprobación"
+
+msgid "Root Namespace"
+msgstr "Ámbito Global"
+
+msgid "Namespace Description"
+msgstr "Descripción del Ámbito"
+
+msgid "Job Restarted"
+msgstr "Pase Reiniciado"
+
+msgid "Job Type"
+msgstr "Tipo de Pase"
+
+msgid "Job Item"
+msgstr "Elemento de Pase"
+
+msgid "Item Type"
+msgstr "Tipo de Elemento"
+
+msgid "Status"
+msgstr "Estado de Ejecución"
+
+msgid "Job"
+msgstr "Pase"
+
+msgid "Job %1 created"
+msgstr "Pase %1 creado"
+
+msgid "Job Status"
+msgstr "Estado del Pase"
+
+msgid "Start Date"
+msgstr "Fecha de Inicio"
+
+msgid "End Date"
+msgstr "Fecha de Finalización"
+
+msgid "Max Start Date"
+msgstr "Fecha Máxima de Inicio"
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "Location"
+msgstr "Ubicación"
+
+msgid "Last Updated"
+msgstr "Última Actualización"
+
+msgid "Promote"
+msgstr "Promoción"
+
+msgid "Development"
+msgstr "Desarrollo"
+
+msgid "Preproduction"
+msgstr "Preproducción"
+
+msgid "Production"
+msgstr "Producción"
+
+msgid "Demote"
+msgstr "Marcha atrás"
+
+msgid "Documentation"
+msgstr "Documentación"
+
+msgid "Remove Job Item"
+msgstr "Eliminar Elemento de Pase"
+
+msgid "Missing job contents"
+msgstr "Falta rellenar el contenido del pase"
+
+msgid "Live search requires a minimum of %1 characters."
+msgstr "Para iniciar la búsqueda es necesario un mínimo de %1 caracteres."
+
+msgid "Are you sure you want to delete the job"
+msgstr "¿Está seguro de que quiere borrar el pase"
+
+msgid "Job %1 is currently running and cannot be deleted"
+msgstr "Pase %1 está actualmente en ejecución y no puede borrarse"
+
+msgid "Submit"
+msgstr "Enviar"
+
+msgid "New"
+msgstr "Crear"
+
+msgid "Add"
+msgstr "Crear"
+
+msgid "Created"
+msgstr "Creado"
+
+msgid "Received"
+msgstr "Recibido"
+
+msgid "Sent"
+msgstr "Enviado"
+
+msgid "Subject"
+msgstr "Asunto"
+
+msgid "From"
+msgstr "De"
+
+msgid "Duplicate"
+msgstr "Duplicar"
+
+msgid "Job Logs"
+msgstr "Logs de Pase"
+
+msgid "action"
+msgstr "acción"
+
+msgid "actions"
+msgstr "acciones"
+
+msgid "Action"
+msgstr "Acción"
+
+msgid "Available Actions"
+msgstr "Acciones Disponibles"
+
+msgid "Actions"
+msgstr "Acciones"
+
+msgid "Role"
+msgstr "Rol"
+
+msgid "Create Role"
+msgstr "Crear Rol"
+
+msgid "The %1 role"
+msgstr "El rol %1"
+
+msgid "Role Name"
+msgstr "Nombre de Rol"
+
+msgid "Roles"
+msgstr "Roles"
+
+msgid "Role Actions"
+msgstr "Acciones del Rol"
+
+msgid "Could not duplicate the role"
+msgstr "No se ha podido duplicar el rol"
+
+msgid "Could not delete the role"
+msgstr "No se ha podido borrar el rol"
+
+msgid "Error deleting the message "
+msgstr "Error borrando el mensaje "
+
+msgid "Message '%1' deleted"
+msgstr "Mensaje '%1' borrada"
+
+msgid "Could not delete the message"
+msgstr "No se ha podido borrar el mensaje"
+
+msgid "Action"
+msgstr "Acción"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Reset"
+msgstr "Restablecer"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Global Preferences"
+msgstr "Preferencias Globales"
+
+msgid "View Preferences"
+msgstr "Preferencias de Visualización"
+
+msgid "Create a new Job"
+msgstr "Crear Nuevo Pase"
+
+msgid "Job Manager"
+msgstr "Gestor de Pases" 
+
+msgid "Job %1 started"
+msgstr  "Pase %1 started"
+
+msgid "Job %1 finished with status %2"
+msgstr  "Pase %1 finalizado en estado %2"
+
+msgid "Create New Job"
+msgstr "Crear Nuevo Pase"
+
+msgid "Rows {0} - {1} of {2}"
+msgstr "Filas {0} - {1} de {2}"
+
+msgid "Select a row first"
+msgstr "Seleccione una fila"
+
+msgid "Create a New Job"
+msgstr "Crear Nuevo Pase"
+
+msgid "Jobs"
+msgstr "Pases"
+
+msgid "Message"
+msgstr "Mensaje"
+
+msgid "Timestamp"
+msgstr "Fecha-Hora"
+
+msgid "Provider"
+msgstr "Origen"
+
+msgid "Level"
+msgstr "Nivel"
+
+msgid "New Job"
+msgstr "Nuevo Pase"
+
+msgid "Cancel Job"
+msgstr "Cancelar Pase"
+
+msgid "View Log"
+msgstr "Ver Log de Pase"
+
+msgid "<Enter your search string>"
+msgstr "<Introduzca cadena de búsqueda>"
+
+msgid "Job Monitor"
+msgstr "Monitor de Pases"
+
+msgid "Job Contents"
+msgstr "Contenido del Pase"
+
+msgid "Job Options"
+msgstr "Opciones del Pase"
+
+msgid "Baseline"
+msgstr "Entorno"
+
+msgid "Service"
+msgstr "Servicio"
+
+msgid "Services"
+msgstr "Servicios"
+
+msgid "Comment"
+msgstr "Observación"
+
+msgid "Comments"
+msgstr "Observaciones"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Time"
+msgstr "Hora"
+
+msgid "Add Job Items"
+msgstr "Seleccione los Elementos del Pase"
+
+msgid "Members"
+msgstr "Miembros"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Delete"
+msgstr "Borrar"
+
+msgid "Delete All"
+msgstr "Borrar Todos"
+
+msgid "Warning"
+msgstr "Aviso"
+
+msgid "Debug"
+msgstr "Debug"
+
+msgid "Information"
+msgstr "Información"
+
+msgid "Confirmation"
+msgstr "Confirmación"
+
+msgid "Success"
+msgstr "Éxito"
+
+msgid "Rerun"
+msgstr "Reiniciar"
+
+msgid "Are you sure you want to rerun the job"
+msgstr "¿Seguro que quiere reiniciar el pase"
+
+msgid "No records found"
+msgstr "No hay registros"
+
+# Calendario
+msgid "Could not delete the calendar."
+msgstr "No he podido borrar el calendario."
+
+msgid "Are you sure you want to delete the calendar"
+msgstr "¿Seguro que quiere borrar el calendario"
+
+msgid "Job Calendars"
+msgstr "Calendarios de Pase"
+
+msgid "Calendar Windows"
+msgstr "Ventanas del Calendario"
+
+msgid "Normal Window"
+msgstr "Ventana Normal"
+
+msgid "Urgent Window"
+msgstr "Ventana Urgente"
+
+msgid "Select at least one row"
+msgstr "Seleccione al menos una fila"
+
+msgid "Calendar '%1' modified"
+msgstr "Calendario '%1' modificado"
+
+msgid "Calendar Windows"
+msgstr "Ventanas de Calendario"
+
+msgid "Error modifying the calendar: "
+msgstr "Error al modificar el calendario: "
+
+msgid "Calendar Modified"
+msgstr "Calendario Modificado"
+
+msgid "Calendar Info"
+msgstr "Datos del Calendario"
+
+msgid "Create Calendar"
+msgstr "Crear Calendario"
+
+msgid "Day"
+msgstr "Día"
+
+msgid "Urgent"
+msgstr "Urgente"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Calendar Name"
+msgstr "Nombre del Calendario"
+
+msgid "All"
+msgstr "Todos"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Owner"
+msgstr "Propietario"
+
+msgid "Host"
+msgstr "Servidor"
+
+msgid "Starts at"
+msgstr "Hora inicio"
+
+msgid "Ends at"
+msgstr "Hora fin"
+
+msgid "Job Calendar"
+msgstr "Calendario de Pase"
+
+msgid "Job Calendars"
+msgstr "Calendarios de Pase"
+
+msgid "Killing the job will interrupt current local processing but no remote processes"
+msgstr "Al matarse el proceso se interrumpen procesos locales, pero no procesos remotos"
+
+msgid "New Window"
+msgstr "Nueva Ventana"
+
+msgid "Modify Window"
+msgstr "Modificar Ventana"
+
+msgid "From %1 to %2"
+msgstr "De %1 a %2"
+
+msgid "A calendar (%1) already exists for namespace %2 and baseline %3"
+msgstr "Un calendario (%1) ya existe para el ámbito %2 y entorno %3"
+
+# Harvest / Endevor
+msgid "Package is not a Promotion Package"
+msgstr "No es un Paquete de Promoción"
+
+msgid "Harvest Subapplication"
+msgstr "Subaplicación de Harvest"
+
+msgid "Harvest Package"
+msgstr "Paquete de Harvest"
+
+msgid "Cache Contents"
+msgstr "Contenido de la Cache"
+
+msgid "Endevor Cache"
+msgstr "Cache de Endevor"
+
+msgid "Reset Cache"
+msgstr "Restablecer Cache"
+
+msgid "Reload"
+msgstr "Recargar"
+
+msgid "Reload Cache"
+msgstr "Recargar Cache"
+
+msgid "Endevor Package"
+msgstr "Paquete de Endevor"
+
+msgid "Endevor Packages"
+msgstr "Paquetes de Endevor"
+
+msgid "Are you sure you want to approve"
+msgstr "¿Seguro que quiere aprobar"
+
+msgid "Approve Jobs"
+msgstr "Aprobar Pases"
+
+msgid "Could not approve the package."
+msgstr "No se ha podido aprobar el paquete."
+
+msgid "approved"
+msgstr "aprobada"
+
+msgid "pending"
+msgstr "pendiente"
+
+msgid "rejected"
+msgstr "rechazada"
+
+msgid "cancelled"
+msgstr "cancelada"
+
+msgid "Request %1 has been %2"
+msgstr "La petición %1 ya ha sido %2"
+
+msgid "Harvest Project"
+msgstr "Proyecto de Harvest"
+
+msgid "Harvest Nature"
+msgstr "Naturaleza de Harvest"
+
+msgid "State"
+msgstr "Estado"
+
+msgid "Create a new Release"
+msgstr "Crear Release"
+
+msgid "New Release"
+msgstr "Nueva Release"
+
+msgid "Add Release Items"
+msgstr "Añadir Elementos a la Release"
+
+msgid "Remove Release Item"
+msgstr "Quitar Elemento de Release"
+
+msgid "Missing release contents"
+msgstr "Hay que añadir el contenido de la release"
+
+msgid "Contents"
+msgstr "Contenido"
+
+msgid "List Packages"
+msgstr "Listar Paquetes"
+
+msgid "List Releases"
+msgstr "Listar Releases"
+
+msgid "Release Name '%1' already exists."
+msgstr "Nombre de Release '%1' ya existe."
+
+msgid "Large job output detected. Trimming will occur"
+msgstr "Salida de job de gran tamaño. Se cortará una parte"
+
+
+# Job Status Codes
+msgid "IN EDIT"
+msgstr "En Edición"
+
+msgid "IN-EDIT"
+msgstr "En Edición"
+
+msgid "READY"
+msgstr "Esperando Inicio"
+
+msgid "EXPIRED"
+msgstr "Caducado"
+
+msgid "KILLED"
+msgstr "Abortado"
+
+msgid "RUNNING"
+msgstr "En Ejecución"
+
+msgid "FINISHED"
+msgstr "Finalizado"
+
+msgid "ERROR"
+msgstr "Error"
+
+msgid "CANCELLED"
+msgstr "Cancelado"
+
+msgid "DONE"
+msgstr "Finalizado"
+
+# Job Types
+
+msgid "promote"
+msgstr "Promoción"
+
+msgid "demote"
+msgstr "Marcha Atrás"
+
+msgid "rollback"
+msgstr "Rollback"
+
+# About
+
+msgid "version"
+msgstr "Versión"
+
+msgid "Process ID"
+msgstr "ID de Proceso"
+
+msgid "Perl Version"
+msgstr "Versión de Perl"
+
+msgid "Hostname"
+msgstr "Nombre del Host"
+
+msgid "Port"
+msgstr "Puerto"
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+

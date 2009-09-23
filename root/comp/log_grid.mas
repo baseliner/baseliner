@@ -1,0 +1,249 @@
+(function(){
+    var filter_key = 'log_filter_<% $c->stash->{id_job} %>' ;
+    var filter_cookie = Baseliner.cookie.get( filter_key );
+    var filter_obj = filter_cookie || {
+        info : true,
+        warn : true,
+        debug: false,
+        error: true
+    };
+    
+	// La fuente de Datos JSON con todos el listado:
+	var store=new Ext.data.JsonStore({
+		root: 'data' , 
+		remoteSort: true,
+		totalProperty:"totalCount", 
+		id: 'id', 
+		url: '/job/log/json',
+		baseParams: {  id_job: '<% $c->stash->{id_job} %>' },
+		fields: [ 
+			{  name: 'id' },
+			{  name: 'id_job' },
+			{  name: 'job' },
+			{  name: 'text' },
+			{  name: 'ts' },
+			{  name: 'lev' },
+			{  name: 'ns' },
+			{  name: 'provider' },
+			{  name: 'file' },
+			{  name: 'more' }
+		]
+	});
+
+    //Filtering
+    var filter_me = function( item, checked ) {
+        filter_obj[ item.id ] = checked;
+        Baseliner.cookie.set( filter_key , filter_obj ); 
+        load_store();
+    };
+
+    var filter_menu = new Ext.menu.Menu({
+        items: [
+            { id: 'info', text: '<% _loc('Information') %>',checked: filter_obj['info'] , checkHandler: filter_me },
+            { id: 'warn', text: '<% _loc('Warning') %>',checked: filter_obj['warn'] , checkHandler: filter_me },
+            { id: 'error', text: '<% _loc('Error') %>', checked: filter_obj['error'], checkHandler: filter_me },
+            { id: 'debug', text: '<% _loc('Debug') %>',checked: filter_obj['debug'] , checkHandler: filter_me }
+        ]
+    });
+
+	// Esta es la definición del objeto buscador
+	Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
+		initComponent : function(){
+			Ext.app.SearchField.superclass.initComponent.call(this);
+			this.on('specialkey', function(f, e){
+				if(e.getKey() == e.ENTER){
+					this.onTrigger2Click();
+				}
+			}, this);
+		},
+
+		validationEvent:false,
+		validateOnBlur:false,
+		trigger1Class:'x-form-clear-trigger',
+		trigger2Class:'x-form-search-trigger',
+		hideTrigger1:true,
+		width:280,
+		hasSearch : false,
+		paramName : 'query',
+
+		onTrigger1Click : function(){
+			if(this.hasSearch){
+				this.el.dom.value = '';
+				var o = {start: 0};
+				this.store.baseParams = this.store.baseParams || {};
+				this.store.baseParams[this.paramName] = '';
+				this.store.reload({params:o});
+				this.triggers[0].hide();
+				this.hasSearch = false;
+			}
+		},
+
+		onTrigger2Click : function(){
+			var v = this.getRawValue();
+			if(v.length < 1){ //>
+				this.onTrigger1Click();
+				return;
+			}
+			var o = {start: 0};
+			this.store.baseParams = this.store.baseParams || {};
+			this.store.baseParams[this.paramName] = v;
+			this.store.reload({params:o});
+			this.hasSearch = true;
+			this.triggers[0].show();
+		}
+	});
+
+    Baseliner.levRenderer = function(value,metadata,rec,rowIndex,colIndex,store) {
+        var icon;
+        if( value=='debug' ) icon='log_d.gif';
+        else if( value=='info' ) icon='log_i.gif';
+        else if( value=='warning' || value=='warn' ) icon='log_w.gif';
+        else if( value=='error' ) icon='log_e.gif';
+        if( icon!=undefined ) {
+            return "<img alt='"+value+"' border=0 src='/static/images/"+icon+"' />" ;
+        } else {
+            return value;
+        }
+    };
+    Baseliner.logColorRenderer = function(value,metadata,rec,rowIndex,colIndex,store) {
+           metadata.attr += " style='background-color:#222299;' ";
+    };
+    Baseliner.actionsRenderer = function(value,metadata,rec,rowIndex,colIndex,store) {
+           var ret="";
+           if( value.more=='file' && value.data ) {
+               ret += "<a href='/job/log/download_data?id=" + rec.id + "' target='FrameDownload'><img border=0 src='/static/images/download.gif'/></a>" ;
+           } 
+           else {
+               if( value.more!='file' && value.data ) {
+                   var data_name = value.data_name;
+                   if( data_name==undefined || data_name.length<1 ) {
+                       data_name = "Log Data " + rec.id;
+                   }
+                   ret += "<a href='#' onclick='javascript:Baseliner.addNewTab(\"/job/log/data?id=" + rec.id + "\",\""+data_name+"\"); return false;'><img border=0 src='/static/images/moredata.gif'/></a>";
+               }
+               if( value.file!=undefined && value.file!='' && value.data ) { // alternative file
+                   ret += "&nbsp;<a href='/job/log/download_data?id=" + rec.id + "&file_name=" + value.file + "' target='FrameDownload'><img border=0 src='/static/images/download.gif'/></a>" ;
+               } 
+           }
+           return ret;
+    };
+
+	// Después de que cargue la página:
+    var ps = 500; //page_size
+    var load_store = function() {
+        var f = Ext.util.JSON.encode( filter_obj );
+		store.load({params:{start:0 , limit: ps, id_job: '<% $c->stash->{id_job} %>', filter: f }}); 
+    };
+    load_store();
+
+		// create the grid
+		var grid = new Ext.grid.GridPanel({
+			renderTo: 'main-panel',
+			title: '<% _loc('Job Log') %>',
+			header: false,
+            /* stripeRows: true, */
+			autoScroll: true,
+			autoWidth: true,
+			store: store,
+			viewConfig: [{
+					forceFit: true
+			}],
+			selModel: new Ext.grid.RowSelectionModel({singleSelect:true}),
+			loadMask:'true',
+			columns: [
+				{ header: '<% _loc('Job') %>', width: 120, dataIndex: 'job', sortable: true },	
+				{ header: '<% _loc('Level') %>', width: 60, dataIndex: 'lev', renderer: Baseliner.levRenderer, sortable: true },
+				{ header: '<% _loc('Timestamp') %>', width: 140, dataIndex: 'ts', sortable: true },	
+				{ header: '<% _loc('Message') %>', width: 450, dataIndex: 'text', sortable: true },
+				{ header: '<% _loc('Namespace') %>', width: 100, dataIndex: 'ns', sortable: true, hidden: true },	
+				{ header: '<% _loc('Provider') %>', width: 100, dataIndex: 'provider', sortable: true, hidden: true },
+				{ header: '<% _loc('Actions') %>', width: 100, dataIndex: 'more', renderer: Baseliner.actionsRenderer, sortable: true }	
+            ],
+			autoSizeColumns: true,
+			deferredRender:true,
+			bbar: new Ext.PagingToolbar({
+								store: store,
+								pageSize: ps,
+								displayInfo: true,
+								displayMsg: '<% _loc('Rows {0} - {1} of {2}') %>',
+								emptyMsg: "No hay registros disponibles"
+						}),        
+			tbar: [ 'Buscar: ', ' ',
+				new Ext.app.SearchField({
+					store: store,
+					params: {start: 0, limit: ps, id_job: '<% $c->stash->{id_job} %>', filter: Ext.util.JSON.encode(filter_obj) },
+					emptyText: '<% _loc('<Enter your search string>') %>'
+				}),
+                { text: '<% _loc('Level') %>', menu: filter_menu },
+<%doc>
+				new Ext.Toolbar.Button({
+					text: '<% _loc('View Log') %>',
+					icon:'/static/ext/resources/images/default/dd/drop-yes.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						Baseliner.addNewTab('/job/log/list', '<% _loc('Job Log') %>');
+					}
+				}),
+</%doc>
+				'->'
+				]
+		});
+
+		grid.on("rowdblclick", function(grid, rowIndex, e ) {
+			var r = grid.getStore().getAt(rowIndex);
+			Ext.Ajax.request({
+				url: '/job/log/data',
+				params: { id: r.get('id') },
+				success: function(xhr) {
+                    var msg = xhr.responseText;
+                    var title = r.get('text');
+                    if( msg == undefined || msg.length < 15 ) { //usually msg has a <pre> tag
+                        msg = '<pre>' + title;
+                        title = r.get('job') + " - Log ID " + r.get('id');
+                    }
+					var win = new Ext.Window({ layout: 'fit', 
+						autoScroll: true,
+                        title: title,
+						height: 600, width: 700, 
+						html: msg
+                    });
+					win.show();
+				},
+				failure: function(xhr) {
+					var win = new Ext.Window({ layout: 'fit', 
+						autoScroll: true, title: 'Error', 
+						height: 600, width: 700, 
+						html: 'Server communication failure:' + xhr.responseText });
+					win.show();
+				}
+			});
+			//Baseliner.addNewTabComp('/job/log/list?id_job=' + r.get('id') , '<% _loc('Log') %>' + r.get('name') );
+		});		
+
+        //Scroll to bottom when the store reloads
+        store.on('load', function(){
+            grid.view.scroller.scroll('down', 9999999999999, true);
+        }); 
+
+   grid.getView().forceFit = true;
+
+   grid.getView().getRowClass = function(rec, index){
+        var css = '';
+        if( rec.data.lev == 'debug' ) 
+            css = index % 2 > 0 ? 'level-row debug-odd' : 'level-row debug-even' ;
+        else if( rec.data.lev == 'error' )  
+            css = index % 2 > 0 ? 'level-row error-odd' : 'level-row error-even' ;
+        else if( rec.data.lev == 'warn' )  
+            css = index % 2 > 0 ? 'level-row warn-odd' : 'level-row warn-even' ;
+        else
+            css = index % 2 > 0 ? 'level-row info-odd' : 'level-row info-even' ;
+
+        return css;
+    }; 
+        
+        
+		Ext.getCmp('main-panel').setActiveTab( Ext.getCmp('main-panel').add(grid) ) ;
+	return grid;
+})();
+
+

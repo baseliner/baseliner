@@ -1,0 +1,157 @@
+(function(){
+    var fields = [ 
+			{  name: 'id' },
+			{  name: 'item' },
+			{  name: 'status' },
+			{  name: 'action' },
+			{  name: 'key' },
+			{  name: 'name' },
+			{  name: 'type' }
+    ];
+	var store=new Ext.data.JsonStore({
+		root: 'data' , 
+		remoteSort: true,
+		totalProperty:"totalCount", 
+		id: 'id', 
+		url: '/request/list_json',
+		fields: fields
+	});
+
+    ///////////////// Request Single Row
+	var request_data_store=new Ext.data.JsonStore({
+		root: 'data' , 
+		remoteSort: true,
+		totalProperty:"totalCount", 
+		id: 'id', 
+		url: '/request/detail',
+		fields: fields 
+	});
+
+    var request_form = new Ext.FormPanel({
+        url: '/role/update',
+        title: '<% _loc('Request') %>',
+        region: 'south',
+        collapsible: true,
+        resizeable: true,
+        height: 350,
+        frame: true,
+        labelWidth: 100, 
+        defaults: { width: 650 },
+        items: [
+            {  xtype: 'hidden', name: 'id', value: -1 }, 
+            {  xtype: 'textfield', name: 'subject', fieldLabel: '<% _loc('Subject') %>' }, 
+            {  xtype: 'textarea', name: 'body', height: 200, fieldLabel: '<% _loc('Request') %>' }
+        ]
+    });
+
+    var request_view = function(id) {
+        //////////////// Single request Data Load Event
+        request_data_store.on('load', function(obj, rec, options ) {
+            try {
+                var rec = request_data_store.getAt(0);
+                var ff = request_form.getForm();
+                ff.loadRecord( rec );
+            } catch(e) {
+                Ext.Msg.alert("<% _loc('Error') %>", "<% _loc('Could not load request form data') %>: " + e.description );
+            }
+        });
+        request_data_store.load({ params:{ id: id }});
+    };
+
+    <& /comp/search_field.mas &>
+
+		var ps = 30; //page_size
+		store.load({params:{start:0 , limit: ps}}); 
+
+		// create the grid
+		var grid = new Ext.grid.GridPanel({
+            region: 'center',
+			title: '<% _loc('Inbox') %>',
+			header: false,
+            stripeRows: true,
+			autoScroll: true,
+			autoWidth: true,
+			store: store,
+			viewConfig: [{
+					forceFit: true
+			}],
+			selModel: new Ext.grid.RowSelectionModel({singleSelect:true}),
+			loadMask:'true',
+			columns: [
+				{ header: '<% _loc('Namespace') %>', width: 200, dataIndex: 'sender', sortable: true },	
+				{ header: '<% _loc('Status') %>', width: 300, dataIndex: 'subject', sortable: true },	
+				{ header: '<% _loc('Type') %>', width: 150, dataIndex: 'to', sortable: true, hidden: true },	
+				{ header: '<% _loc('Name') %>', width: 300, dataIndex: 'name', sortable: true },	
+				{ header: '<% _loc('Requested On') %>', width: 150, dataIndex: 'requested_on', sortable: true } ,
+				{ header: '<% _loc('Finished On') %>', width: 150, dataIndex: 'finished_on', sortable: true, hidden: true }	
+			],
+			autoSizeColumns: true,
+			deferredRender:true,
+			bbar: new Ext.PagingToolbar({
+								store: store,
+								pageSize: ps,
+								displayInfo: true,
+								displayMsg: '<% _loc('Rows {0} - {1} de {2}') %>',
+								emptyMsg: "No hay registros disponibles"
+						}),        
+			tbar: [ 'Buscar: ', ' ',
+				new Ext.app.SearchField({
+					store: store,
+					params: {start: 0, limit: ps},
+					emptyText: '<% _loc('<Enter your search string>') %>'
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('View') %>',
+					icon:'/static/images/drop-yes.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						if (sm.hasSelection()) {
+							var sel = sm.getSelected();
+                            request_view(sel.data.id);
+						} else {
+							Ext.Msg.alert('Error', '<% _loc('Select at least one row') %>');	
+						};
+					}
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Delete') %>',
+					icon:'/static/images/del.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						var sel = sm.getSelected();
+						Ext.Msg.confirm('<% _loc('Confirmation') %>', '<% _loc('Are you sure you want to delete the request') %>' + ' <b>' + sel.data.subject + '</b>?', 
+							function(btn){ 
+								if(btn=='yes') {
+									var conn = new Ext.data.Connection();
+									conn.request({
+										url: '/request/delete',
+										params: { id_request: sel.data.id_request },
+										success: function(resp,opt) { grid.getStore().remove(sel); },
+										failure: function(resp,opt) { Ext.Msg.alert('<% _loc('Error') %>', '<% _loc('Could not delete the request') %>'); }
+									});	
+								}
+							} );
+					}
+				}),
+				'->'
+				]
+		});
+
+	grid.getView().forceFit = true;
+
+	grid.on("rowclick", function(grid, rowIndex, e ) {
+			var row = grid.getStore().getAt(rowIndex);
+            request_view( row.get('id') );
+		});		
+	
+    var panel = new Ext.Panel({
+        layout: 'border',
+        items: [ grid, request_form ]
+    });
+	return panel;
+})();
+
+
+

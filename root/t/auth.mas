@@ -1,0 +1,12 @@
+<%perl>
+    print "AUTH=" . $c->model('Permissions')->user_has_action('ROG2833Z', 'action.admin.role' );
+
+        $c->model('Messaging')->notify(
+            subject => _loc('Job %1 finished with status %2', 'N01010101', _loc( 'ERROR' ) ),
+            sender => 'Me',
+            message => '',
+            to_users => [ 'ROG2833Z' ],
+            # to_actions=> ['action.notify.job.end'],
+        );
+
+</%perl>

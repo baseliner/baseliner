@@ -1,0 +1,245 @@
+<%init>
+	use Baseliner::Utils;
+	my $iid = "div-" . _nowstamp();
+
+</%init>
+<%perl>
+
+</%perl>
+<script type='text/javascript'>
+
+Ext.onReady(function(){
+    Ext.QuickTips.init();
+    var bd = Ext.get('releaseForm<% $iid %>');
+
+	var baselines = new Ext.data.SimpleStore({ 
+	   fields: ['bl', 'name'], 
+	   data : <% js_dumper( $c->stash->{baselines} ) %>
+	}); 
+
+    //    bd.createChild({tag: 'h2', html: 'Select the release contents'});
+	//------- Search Combo
+    var colModel = new Ext.grid.ColumnModel([
+        {id:'item',header: "<% _loc('Release Item') %>", width: 160, sortable: true, locked:false, dataIndex: 'item'},
+        {header: "<% _loc('Item Type') %>", width: 125, sortable: true, dataIndex: 'provider'},
+        {header: "<% _loc('User') %>", width: 75, sortable: true, dataIndex: 'user'},
+        {header: "<% _loc('Location') %>", width: 85, sortable: true, dataIndex: 'ns' },
+        {header: "<% _loc('Last Updated') %>", width: 85, sortable: true, dataIndex: 'date' },
+        {header: "<% _loc('Description') %>", width: 350, sortable: true, dataIndex: 'text'}
+    ]);
+% unless( $c->stash->{id} ) {
+    var ds_grid = new Ext.data.Store({});
+% } else {
+    var ds_grid = new Ext.data.Store({
+        proxy: new Ext.data.HttpProxy({
+            url: '/release/contents/json'
+        }),
+        reader: new Ext.data.JsonReader({
+            root: 'data',
+            totalProperty: 'totalCount',
+            id: 'id'
+        }, [
+            {name: 'provider', mapping: 'provider'},
+            {name: 'item', mapping: 'item'},
+            {name: 'user', mapping: 'user'},
+            {name: 'ns', mapping: 'ns'},
+            {name: 'date', mapping: 'date'},
+            {name: 'icon', mapping: 'icon'},
+            {name: 'data', mapping: 'data'},
+            {name: 'text', mapping: 'text'}
+        ])
+	});
+	ds_grid.load({params: {  id: '<% $c->stash->{id} %>' }});
+% }
+	var jc_grid = new Ext.grid.GridPanel({
+			width: 800,
+			height: 300,
+			style: 'margin-top: 20px',
+			name: 'jc',
+			title: '<% _loc('Release Contents') %>',
+			border: true,
+			ds: ds_grid,
+			cm: colModel
+	});
+	var tb = new Ext.Toolbar({
+			style: 'margin: 3px',
+			items: [ 
+				{
+					xtype: 'button',
+					text: '<% _loc('Remove Release Item') %>',
+					icon:'/static/images/del.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = jc_grid.getSelectionModel();
+						var sel = sm.getSelected();
+						jc_grid.getStore().remove(sel);
+					}
+				},
+			'->',
+			{ xtype:'button', text: '<% _loc('Submit') %>', handler: function(){
+					// turn grid into JSON to post data
+					var cnt = jc_grid.getStore().getCount();
+					if( cnt == 0 ) {
+						Ext.Msg.show({icon: 'ext-mb-error', buttons: { cancel: true }, title: "Form error", msg: "<% _loc('Missing release contents') %>"});
+						return 1;
+					}
+					var json = [];
+					for( i=0; i<cnt; i++) {
+						var rec = jc_grid.getStore().getAt(i);
+						json.push( Ext.util.JSON.encode( rec.data )) ;
+					}
+					var json_res = '[' + json.join(',') + ']';
+					main_form.getForm().submit({
+						params: { release_contents: json_res },
+						success: function(form,action){
+							Baseliner.message("<% _loc('Release') %>", action.result.msg);
+							main_form.getForm().reset();
+						},
+						failure: function(form,action){
+							Ext.Msg.show({ title: "<% _loc('Failure') %>", msg: action.result.msg, width: 500, buttons: { ok: true } });
+						}
+					});
+				}
+			},
+			{ xtype:'button',text:'<% _loc('Reset') %>', handler: function() { 
+					jc_grid.getStore().removeAll();
+					main_form.getForm().reset();
+				}  
+			}] 
+	});
+	var main_form = new Ext.FormPanel({ 
+			 url: '/release/update', 
+			 renderTo: 'releaseForm<% $iid %>',
+			 frame: true, 
+			 title: '<% _loc('Release Options') %>', 
+			 width: 900, 
+			 items: [
+				 tb,
+				  { xtype: 'hidden', name: 'id_rel', value: '<% $c->stash->{id} %>' },
+				  { xtype: 'hidden', name: 'contents', value: '<% $c->stash->{contents} %>' },
+				  { 
+					xtype: 'textfield', 
+					fieldLabel: '<% _loc('Release') %>', 
+				    allowBlank: false,
+					width: 400,
+					value: '<% $c->stash->{name} %>',
+					name: 'release_name' 
+				  },
+				{
+					   xtype: 'combo', 
+					   name: 'bl', 
+					   hiddenName: 'bl',
+					   fieldLabel: '<% _loc('Baseline') %>', 
+					   mode: 'local', 
+					   store: baselines, 
+					   valueField: 'bl',
+					   value: '<% $c->stash->{bl} || $c->stash->{baselines}->[0]->[0] %>',
+					   displayField:'name', 
+					   editable: false,
+					   forceSelection: true,
+					   triggerAction: 'all',
+					   allowBlank: false,
+					   listeners: {
+					   	   select: { fn: function(){ jc_grid.getStore().removeAll(); } }
+						},
+					   width: 120 
+				}, 
+				  { 
+					xtype: 'textarea', 
+					fieldLabel: '<% _loc('Comments') %>', 
+					width: 500,
+					value: '<% $c->stash->{description} %>',
+					name: 'comments' 
+				  },
+				  jc_grid
+			  ] 
+		  }); 
+
+    Ext.form.Field.prototype.msgTarget = 'side';
+
+	//-------------
+    var ds_combo = new Ext.data.Store({
+        proxy: new Ext.data.HttpProxy({
+            url: '/release/items/json',
+			param: { bl: main_form.getForm().findField('bl').getValue() }
+        }),
+		listeners: {
+			beforeload: {
+				fn: function(store,opt) {
+					var bl = main_form.getForm().findField('bl').getValue(); 
+					var release_type = main_form.getForm().getValues()['release_type'];
+					store.baseParams.bl = bl;
+					store.baseParams.release_type = release_type;
+				}
+			},
+			load: {
+				fn: function(store,opt) {
+					if( store.getTotalCount() == 0 ) {
+						Baseliner.message("<% _loc('Warning') %>", "<% _loc('No records found') %>");
+					}
+				}
+			}
+		},
+        reader: new Ext.data.JsonReader({
+            root: 'data',
+            totalProperty: 'totalCount',
+            id: 'id'
+        }, [
+            {name: 'provider', mapping: 'provider'},
+            {name: 'item', mapping: 'item'},
+            {name: 'user', mapping: 'user'},
+            {name: 'ns', mapping: 'ns'},
+            {name: 'date', mapping: 'date'},
+            {name: 'icon', mapping: 'icon'},
+            {name: 'data', mapping: 'data'},
+            {name: 'text', mapping: 'text'}
+        ])
+    });
+            // {name: 'lastPost', mapping: 'post_time', type: 'date', dateFormat: 'timestamp'},
+            //'<h3><span>{lastPost:date("M j, Y")}<br />by {author}</span>{title}</h3>',
+
+    // Custom rendering Template
+    var resultTpl = new Ext.XTemplate(
+        '<tpl for="."><div class="search-item">',
+            '<h3><span>{provider}<br />by {user}</span><img src="{icon}" />{item}</h3>',
+            '{text}',
+        '</div></tpl>'
+    );
+    
+    var search = new Ext.form.ComboBox({
+        store: ds_combo,
+        minChars :3,
+        displayField:'item',
+        typeAhead: false,
+        loadingText: '<% _loc('Searching...') %>',
+        width: 550,
+        pageSize: 20,
+        hideTrigger:true,
+        tpl: resultTpl,
+        applyTo: 'search<% $iid %>',
+        itemSelector: 'div.search-item',
+        onSelect: function(record){ // override default onSelect to do redirect
+			ds_grid.add(record);
+        }
+    });
+
+    if( Ext.isIE ) document.getElementById('search<% $iid %>').style.top = 0; // hack fix
+});
+
+</script>
+
+
+<div class='tab-style' style="width:600px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <h3 style="margin-bottom:5px;"><% _loc('Add Release Items') %></h3>
+			<input type="text" size="40" name="search<% $iid %>" id="search<% $iid %>" />
+        <div style="padding-top:4px;"><% _loc('Live search requires a minimum of %1 characters.', 3) %></div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+
+<div class='tab-style' id='releaseForm<% $iid %>'></div>
+
+

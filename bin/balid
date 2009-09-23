@@ -1,0 +1,12 @@
+#!/usr/bin/ksh
+cd $BASELINER_HOME
+export NLS_LANG=SPANISH_SPAIN.UTF8
+# -X : no warnings for production environments
+if [ "$1" == "stop" ];
+then
+        ps uwwx|grep perl|grep "bali.pl"|grep -v grep|awk '{ print $2 }'|xargs kill
+        echo "balid: killed ok."
+        exit 0
+fi
+nohup perl -X script/bali.pl $* >$BASELINER_LOGHOME/balid.log 2>&1 &
+

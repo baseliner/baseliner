@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="ageye GBR" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<title>ageye.de: Windows Mobile software and games</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/prototype.js"></script>
+<script type="text/javascript" src="js/scriptaculous.js?load=effects,builder"></script>
+<script type="text/javascript" src="js/lightbox.js"></script>
+<link rel="stylesheet" href="css/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript"> <!--
+function Find()
+{
+	if (document.getElementById("uncrypt"))
+	{
+		var temp = Un(document.getElementById("uncrypt").title);
+		document.getElementById("uncrypt").innerHTML = '<a href="' + temp + '">' + temp.replace( /mailto:/, ''); + '</a>';
+		document.getElementById("uncrypt").title = temp.replace( /mailto:/, '');
+	}
+}
+function Un( s )
+{
+	var n = 0;
+	var r = "";
+	for( var i = 0; i < s.length; i++)
+	{
+		n = s.charCodeAt( i );
+		if( n >= 8364 )
+		{
+			n = 128;
+		}
+		r += String.fromCharCode( n - 1 );
+	}
+	return r;
+}
+
+function MUn( s )
+{
+	location.href=Un( s );
+}
+// --> </script>
+</head>
+
+<body onload="Find()">
+<div id="container">
+	<div id="head">
+    	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+        	<tr><td align="right" style="padding-top: 5px; padding-right: 5px;">			<a href="index.php?s=products&l=en"><img src="gfx/sections/common/flag_en.png" border="0" title="english" alt="english" /></a> <a href="index.php?s=products&l=en">English</a> <a href="index.php?s=products&l=en"><img src="gfx/sections/common/flag_de.png" border="0" title="german" alt="german" /></a> <a href="index.php?s=products&l=de">Deutsch</a></td></tr>
+            <tr>
+            	<td valign="top"><div id="logo"><img src="gfx/logo.png" alt="ageye" title="ageye" border="0" /></div></td>
+            </tr>
+        </table>
+    </div>
+    <div id="menu"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr height="63"><td><span id="menu_item"><a href="index.php?s=home" class="menu_item_nsel">Home</a></span><span id="menu_item"><a href="index.php?s=products" class="menu_item_sel">Products</a></span><span id="menu_item"><a href="index.php?s=shop" class="menu_item_nsel">Shop</a></span><span id="menu_item"><a href="index.php?s=download" class="menu_item_nsel">Download</a></span><span id="menu_item"><a href="index.php?s=contact" class="menu_item_nsel">Contact</a></span></td><td align="right"><form action="index.php" method="get"><input type="hidden" name="s" value="search" /><input id="styled_search" type="text" name="search" value="Search" onFocus="if (this.value=='Search') { this.value = ''; };this.className='selected';" onBlur="this.className='';if (this.value=='') { this.value = 'Search'; };" onSelect="this.className='selected';if (this.value=='Search') { this.value = ''; };" style="margin-right: 20px;" /></form></td></tr></table></div>
+	<div style="height: 15px"></div>        <div id="products_big"><div id="products_big_content" onclick="self.location='index.php?s=galarm/about'"><div id="products_big_logo" style="width: 500px;left: 450px;"><img src="gfx/sections/products_big/galarm_hl_en.png" border="0" alt="G-Alarm" title="G-Alarm" /></div><div id="products_big_box"><div style="position: absolute; top: -26px; right: -26px;"><img src="gfx/sections/common/icon_499_en.png" border="0" /></div><img src="gfx/sections/products_big/galarm_title.png" border="0" align="G-Alarm" title="G-Alarm" /><p>Version 2 with lots of new features is now available:</p>
+      <ul>
+        <li>completely revised program</li>
+        <li>improved interface and speed</li>
+        <li>Talking clock</li>
+        <li>Backup and recover your settings</li>
+        <li>and much more!</li>
+      </ul>
+      <p align="right"><a href="index.php?s=galarm/about">&raquo; more information</a></p>
+</div></div></div>
+<table border="0" width="100%" cellpadding="0" cellspacing="0" width="100%">
+<tr><td align="center">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><div id="products_small" class="products_small_left">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" height="207">
+    <tr height="87"><td colspan="2" align="left" valign="middle" style="padding-left: 10px;" onclick="self.location='index.php?s=galarm/about'"><a href="index.php?s=galarm/about"><img src="gfx/sections/galarm.png" border="0" title="G-Alarm v2" alt="G-Alarm v2" align="absmiddle" /></a></td></tr>
+    <tr height="76"><td colspan="2" align="center" valign="middle" onclick="self.location='index.php?s=galarm/about'" style="padding: 0 20px;">A powerful alarm clock</td></tr>
+    <tr height="44"><td width="50%" align="center" onclick="self.location='index.php?s=download'"><a href="index.php?s=download#galarm"><strong>Download</strong></a></td><td width="50%" align="center" onclick="self.location='index.php?s=galarm/about'"><a href="index.php?s=galarm/about"><strong>Product page</strong></a></td></tr>
+    </table>
+</div>
+</td>
+    <td><div id="products_small">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" height="207">
+    <tr height="87"><td colspan="2" align="left" valign="middle" style="padding-left: 10px;" onclick="self.location='index.php?s=gwatch/about'"><a href="index.php?s=gwatch/about"><img src="gfx/sections/gwatch.png" border="0" title="G-Watch" alt="G-Watch" align="absmiddle" /></a></td></tr>
+    <tr height="76"><td colspan="2" align="center" valign="middle" onclick="self.location='index.php?s=gwatch/about'" style="padding: 0 20px;">A stopwatch, timer, GPS tracking and geocaching tool</td></tr>
+    <tr height="44"><td width="50%" align="center" onclick="self.location='index.php?s=download'"><a href="index.php?s=download#gwatch"><strong>Download</strong></a></td><td width="50%" align="center" onclick="self.location='index.php?s=gwatch/about'"><a href="index.php?s=gwatch/about"><strong>Product page</strong></a></td></tr>
+    </table>
+</div>
+</td>
+    <td><div id="products_small" class="products_small_right">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" height="207">
+    <tr height="87"><td colspan="2" align="left" valign="middle" style="padding-left: 10px;" onclick="self.location='index.php?s=gprofile/about'"><a href="index.php?s=gprofile/about"><img src="gfx/sections/gprofile.png" border="0" title="G-Profile" alt="G-Profile" align="absmiddle" /></a></td></tr>
+    <tr height="76"><td colspan="2" align="center" valign="middle" onclick="self.location='index.php?s=gprofile/about'" style="padding: 0 20px;">Create profiles for your device</td></tr>
+    <tr height="44"><td width="50%" align="center" onclick="self.location='index.php?s=download'"><a href="index.php?s=download#gprofile"><strong>Download</strong></a></td><td width="50%" align="center" onclick="self.location='index.php?s=gprofile/about'"><a href="index.php?s=gprofile/about"><strong>Product page</strong></a></td></tr>
+    </table>
+</div>
+</td>
+  </tr>
+  <tr>
+    <td><div id="products_small" class="products_small_left">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" height="207">
+    <tr height="87"><td colspan="2" align="left" valign="middle" style="padding-left: 10px;" onclick="self.location='index.php?s=glight/about'"><a href="index.php?s=glight/about"><img src="gfx/sections/glight.png" border="0" title="G-Light" alt="G-Light" align="absmiddle" /></a></td></tr>
+    <tr height="76"><td colspan="2" align="center" valign="middle" onclick="self.location='index.php?s=glight/about'" style="padding: 0 20px;">Control the backlight of your device</td></tr>
+    <tr height="44"><td width="50%" align="center" onclick="self.location='index.php?s=download'"><a href="index.php?s=download#glight"><strong>Download</strong></a></td><td width="50%" align="center" onclick="self.location='index.php?s=glight/about'"><a href="index.php?s=glight/about"><strong>Product page</strong></a></td></tr>
+    </table>
+</div>
+</td>
+    <td><div id="products_small">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" height="207">
+    <tr height="87"><td colspan="2" align="left" valign="middle" style="padding-left: 10px;" onclick="self.location='index.php?s=caver/about'"><a href="index.php?s=caver/about"><img src="gfx/sections/caver.png" border="0" title="Caver" alt="Caver" align="absmiddle" /></a></td></tr>
+    <tr height="76"><td colspan="2" align="center" valign="middle" onclick="self.location='index.php?s=caver/about'" style="padding: 0 20px;">Don't hit the walls</td></tr>
+    <tr height="44"><td width="50%" align="center" onclick="self.location='index.php?s=download'"><a href="index.php?s=download#caver"><strong>Download</strong></a></td><td width="50%" align="center" onclick="self.location='index.php?s=caver/about'"><a href="index.php?s=caver/about"><strong>Product page</strong></a></td></tr>
+    </table>
+</div>
+</td>
+    <td><div id="products_small" class="products_small_right">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" height="207">
+    <tr height="87"><td colspan="2" align="left" valign="middle" style="padding-left: 10px;" onclick="self.location='index.php?s=ginv/about'"><a href="index.php?s=ginv/about"><img src="gfx/sections/ginv.png" border="0" title="G-Invaders" alt="G-Invaders" align="absmiddle" /></a></td></tr>
+    <tr height="76"><td colspan="2" align="center" valign="middle" onclick="self.location='index.php?s=ginv/about'" style="padding: 0 20px;">Save the galaxies by fighting invading aliens</td></tr>
+    <tr height="44"><td width="50%" align="center" onclick="self.location='index.php?s=download'"><a href="index.php?s=download#ginv"><strong>Download</strong></a></td><td width="50%" align="center" onclick="self.location='index.php?s=ginv/about'"><a href="index.php?s=ginv/about"><strong>Product page</strong></a></td></tr>
+    </table>
+</div>
+</td>
+  </tr>
+</table>
+</td></tr></table>    <div id="footer"><a href="index.php?s=termsandconditions">Terms and conditions</a> | <a href="index.php?s=returnpolicy">Return policy</a> | <a href="index.php?s=privacypolicy">Privacy policy</a> | <a href="index.php?s=imprint">Imprint</a> | <a href="index.php?s=shop/faq">Frequently asked questions</a> | <a href="index.php?s=partner">Partner</a> | <a href="index.php?s=shop/status">Order status</a> | <a href="http://forum.ageye.de" target="_blank">Forum</a><br />&copy; 2009 ageye GbR</div>
+</div>
+</body>
+</html>

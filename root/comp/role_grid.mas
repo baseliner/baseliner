@@ -1,0 +1,452 @@
+(function(){
+	var store=new Ext.data.JsonStore({
+		root: 'data' , 
+		remoteSort: true,
+		totalProperty:"totalCount", 
+		id: 'rownum', 
+		url: '/role/json',
+		fields: [ 
+			{  name: 'id' },
+			{  name: 'role' },
+			{  name: 'actions' },
+			{  name: 'users' },
+			{  name: 'description' }
+		]
+	});
+    
+    ///////////////// Role Single Row
+	var role_data_store=new Ext.data.JsonStore({
+		root: 'data' , 
+		remoteSort: true,
+		totalProperty:"totalCount", 
+		id: 'rownum', 
+		url: '/role/role_detail_json',
+		fields: [ 
+			{  name: 'id' },
+			{  name: 'name' },
+			{  name: 'actions' },
+			{  name: 'bl' },
+			{  name: 'description' }
+		]
+	});
+
+    //////////////// Single Role Data Load
+    var role_detail_edit = function(id_role) {
+       if( id_role!=undefined ) {
+           role_data_store.load({ params:{ id: id_role } }); 
+       }
+    };
+
+    //////////////// Single Role Data Load Event
+    role_data_store.on('load', function(obj, rec, options ) {
+        try {
+            var rec = role_data_store.getAt(0);
+            role_detail( rec );
+        } catch(e) {
+            Ext.Msg.alert("<% _loc('Error') %>", "<% _loc('Could not load role form data') %>: " + e.description );
+        }
+    });
+    
+    //////////////// Role Create / Edit Window
+    var role_detail = function(rec) {
+       var new_role_form = new Ext.FormPanel({
+            url: '/role/update',
+            region: 'center',
+            frame: true,
+            labelWidth: 100, 
+            defaults: { width: 250 },
+            buttons: [
+                {  text: '<% _loc('OK') %>',
+                    handler: function(){ 
+                        var ff = new_role_form.getForm();
+                        var actions_json = action_grid_data();
+                        ff.submit({
+                            params: { role_actions: actions_json },
+                            success: function(form, action) { 
+                                grid.getStore().load();
+                                win.close(); 
+                            },
+                            failure: function(form, action) { Ext.Msg.alert("<% _loc('Failure') %>", action.result.msg); }
+                        });
+                    }
+                },
+                {  text: '<% _loc('Cancel') %>' , handler: function(){  win.close() } }
+            ],
+            items: [
+                {  xtype: 'hidden', name: 'id', value: -1 }, 
+                {  xtype: 'textfield', name: 'name', fieldLabel: '<% _loc('Role Name') %>' }, 
+                {  xtype: 'textarea', name: 'description', height: 100, fieldLabel: '<% _loc('Description') %>' }
+            ]
+        });
+
+        //////////////// Actions Tree
+        var treeLoader = new Ext.tree.TreeLoader({
+            dataUrl: '/role/action_tree',
+            baseParams: { type: 'all' },
+            preloadChildren:true
+        });
+
+        var tree_check_folder_enabled = function(root) { // checks if parent folder has children
+                var flag= grid_role.store.getCount()<1 ? false : true;
+                root.eachChild( function(child) {
+                    if( ! child.disabled ) {
+                        flag = false;
+                    }
+                });
+                if( flag )  root.disable();
+                else        root.enable();
+        };
+
+        var tree_check_in_grid = function(node) {
+                var ff = grid_role.store.find('action', node.id );
+                if( ff  >=0 ) { // check if its in the grid already
+                    node.disable();
+                } else {
+                    node.enable();
+                }
+        };
+        
+        var tree_check = function(node) {
+                if( node.isLeaf() ) {
+                    tree_check_in_grid( node );
+                    tree_check_folder_enabled(node.parentNode);
+                } else {
+                    node.eachChild( function(child) {
+                        if( child.isLeaf() ) {
+                            tree_check( child );
+                        } else {
+                            tree_check( child );
+                            child.removeListener('expand', tree_check );
+                            child.on({ 'expand': { fn: tree_check } });
+                            if( child.hasChildNodes() )  {
+                                tree_check_folder_enabled(child);
+                            }
+                        }
+                    });
+                }
+        };
+                
+        var treeRoot = new Ext.tree.AsyncTreeNode({
+                text: '<% _loc('actions') %>',
+                draggable: false,
+                id:'action.root',
+                listeners: {
+                    expand: tree_check
+                }
+        });
+
+        var new_role_tree = new Ext.tree.TreePanel({
+            region:'west',
+            title:'<% _loc('Available Actions') %>',
+            loader: treeLoader,
+            width: 200,
+            split: true,
+            colapsible: true,
+            useArrows: true,
+            ddGroup: 'secondGridDDGroup',
+            animate: true,
+            enableDrag: true,
+            containerScroll: true,
+            autoScroll: true,
+            rootVisible: false,
+            root: treeRoot
+        });
+        //////////////// Actions belonging to a role
+        var action_store=new Ext.data.Store({ fields: [ {  name: 'action' }, {  name: 'description' }, { name: 'bl' } ] });
+        
+	    var baselines = new Ext.data.SimpleStore({ 
+		   fields: ['bl', 'name'], 
+		   data : <% js_dumper( $c->stash->{baselines} ) %>
+	    }); 
+
+	    var cm = new Ext.grid.ColumnModel({
+			defaults: {
+				sortable: true // columns are not sortable by default           
+			},
+			columns: [
+					{ header: '<% _loc('Action') %>', width: 200, dataIndex: 'action', sortable: true },	
+					{ header: '<% _loc('Description') %>', width: 200, dataIndex: 'description', sortable: true },
+					{ header: '<% _loc('Baseline') %>', width: 200, dataIndex: 'bl', sortable: true,
+							  editor: new Ext.form.ComboBox({
+								  typeAhead: true,
+								  triggerAction: 'all',
+								  valueField: 'bl',
+								  value: '<% $c->stash->{baselines}->[0]->[0] %>',
+								  displayField:'name', 
+								  lazyRender: true,
+								  store: baselines,
+								  listClass: 'x-combo-list-small',
+								  editable: false
+							  })
+					}
+			]
+		});
+		
+
+        var grid_role = new Ext.grid.GridPanel({
+            title: '<% _loc('Role Actions') %>',
+            region: 'south',
+            stripeRows: true,
+            autoScroll: true,
+            store: action_store,
+			clicksToEdit: 1,
+            width: 350,
+			cm: cm,
+            bbar: [ 
+                new Ext.Toolbar.Button({
+                    text: '<% _loc('Delete') %>',
+                    icon:'/static/images/del.gif',
+                    cls: 'x-btn-text-icon',
+                    handler: function() {
+                        var sm = grid_role.getSelectionModel();
+                        if (sm.hasSelection()) {
+                            var sel = sm.getSelected();
+                            grid_role.getStore().remove(sel);
+                            tree_check( treeRoot );
+                        }
+                    }
+                }),
+                new Ext.Toolbar.Button({
+                    text: '<% _loc('Delete All') %>',
+                    icon:'/static/images/del.gif',
+                    cls: 'x-btn-text-icon',
+                    handler: function() {
+                        grid_role.getStore().removeAll();
+                        tree_check( treeRoot );
+                    }
+                })
+            ],
+            height: 200
+        });
+
+        var action_grid_data = function() {
+                // turn grid into JSON to post data
+                var cnt = grid_role.getStore().getCount();
+                var json = [];
+                for( i=0; i<cnt; i++) {
+                    var rec = grid_role.getStore().getAt(i);
+                    json.push( Ext.util.JSON.encode( rec.data )) ;
+                }
+                var json_res = '[' + json.join(',') + ']';
+                return json_res;
+        };
+
+        var win = new Ext.Window({
+            layout: 'border',
+            height: 450, width: 600,
+            closeAction: 'close',
+            autoDestroy: true,
+            title: '<% _loc('Create Role') %>',
+              items : [
+                  new_role_form,
+                  grid_role,
+                  new_role_tree
+              ] 
+        });
+
+        //////// Show the Window
+        win.show();
+
+        //////// Load form and grid data
+        grid_role.store.removeAll();
+        if( rec!=undefined ) {
+            // Grid
+            var gs = grid_role.store;
+            var rd = rec.data.actions;
+            if( rd!=undefined ) {
+                for( var i=0; i < rd.length; i++ ) {
+                    var rec_action = new Ext.data.Record( rd[i] );
+                    gs.add( rec_action );
+                }
+            }
+            // Form
+            var ff = new_role_form.getForm();
+            ff.loadRecord( rec );
+        }
+
+        var win_choose_bl = new Ext.Window({
+            layout: 'border',
+            height: 450, width: 600,
+            closeAction: 'close',
+            autoDestroy: true,
+            title: '<% _loc('Create Role') %>',
+              items : [
+			  	{ xtype: 'form',
+				  items: [
+					   new Ext.form.ComboBox({
+								name: 'bl', 
+								hiddenName: 'bl',
+								fieldLabel: '<% _loc('Baseline') %>', 
+								mode: 'local', 
+								store: baselines, 
+								valueField: 'bl',
+								value: '<% $c->stash->{baselines}->[0]->[0] %>',
+								displayField:'name', 
+								editable: false,
+								forceSelection: true,
+								triggerAction: 'all',
+								allowBlank: false,
+								listeners: {
+								   select: { fn: function(combo,rec,index){
+													form.getForm().load({
+															 url:  '/config/json',
+															 params: { bl: rec.data.bl  }
+													});
+											      }
+										   }
+							    }, 
+								width: 120 
+							})
+				        ]	
+					 }
+				  ] 
+        });
+
+        ////////// Setup the Drop Target - now that the window is shown
+        var secondGridDropTarget = new Ext.dd.DropTarget(grid_role.getView().scroller.dom, {
+                ddGroup    : 'secondGridDDGroup',
+                notifyDrop : function(dd, e, data){
+                        var n = dd.dragData.node;
+                        var s = grid_role.store;
+                        var add_node = function(node ) {
+                            if( s.find('action', node.id ) < 0 ) {
+                                var rec = new Ext.data.Record({ action: node.id, description: node.text });
+                                s.add(rec);
+                                //s.sort('action', 'ASC');
+                                var parent_node = node.parentNode;
+                                node.disable();
+                                tree_check_folder_enabled(parent_node);
+                            }
+                        };
+                        if( n.leaf ) {
+                            add_node(n);
+                        } else {
+                            n.expand();
+                            n.eachChild( function(child) {
+                                if( ! child.disabled ) 
+                                    add_node( child );
+                            });
+                        }
+                        return true;
+                }
+        });
+    }
+
+    <& /comp/search_field.mas &>
+
+		var ps = 30; //page_size
+		store.load({params:{start:0 , limit: ps}}); 
+
+		// create the grid
+		var grid = new Ext.grid.GridPanel({
+			renderTo: 'main-panel',
+			title: '<% _loc('Roles') %>',
+			header: false,
+            stripeRows: true,
+			autoScroll: true,
+			autoWidth: true,
+			store: store,
+			viewConfig: [{
+					forceFit: true
+			}],
+			selModel: new Ext.grid.RowSelectionModel({singleSelect:true}),
+			loadMask:'true',
+			columns: [
+				{ header: '<% _loc('Role') %>', width: 200, dataIndex: 'role', sortable: true },	
+				{ header: '<% _loc('Description') %>', width: 200, dataIndex: 'description', sortable: true },	
+				{ header: '<% _loc('Actions') %>', width: 400, dataIndex: 'actions', sortable: true } ,
+				{ header: '<% _loc('Members') %>', width: 150, dataIndex: 'users', sortable: true }	
+			],
+			autoSizeColumns: true,
+			deferredRender:true,
+			bbar: new Ext.PagingToolbar({
+								store: store,
+								pageSize: ps,
+								displayInfo: true,
+								displayMsg: 'Rows {0} - {1} de {2}',
+								emptyMsg: "No hay registros disponibles"
+						}),        
+			tbar: [ 'Buscar: ', ' ',
+				new Ext.app.SearchField({
+					store: store,
+					params: {start: 0, limit: ps},
+					emptyText: '<% _loc('<Enter your search string>') %>'
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Add') %>',
+					icon:'/static/images/drop-add.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+                        role_detail();
+                    }
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Edit') %>',
+					icon:'/static/images/drop-yes.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						if (sm.hasSelection()) {
+							var sel = sm.getSelected();
+                            role_detail_edit(sel.data.id);
+						} else {
+							Ext.Msg.alert('Error', '<% _loc('Select at least one row') %>');	
+						};
+					}
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Duplicate') %>',
+					icon:'/static/images/drop-copy.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						if (sm.hasSelection()) {
+							var sel = sm.getSelected();
+                            var conn = new Ext.data.Connection();
+                            conn.request({
+                                url: '/role/duplicate',
+                                params: { id_role: sel.data.id },
+                                success: function(resp,opt) { grid.getStore().load(); },
+                                failure: function(resp,opt) { Ext.Msg.alert('<% _loc('Error') %>', '<% _loc('Could not duplicate the role') %>'); }
+                            });	
+						} else {
+							Ext.Msg.alert('Error', '<% _loc('Select at least one row') %>');	
+						};
+					}
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Delete') %>',
+					icon:'/static/images/del.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						var sel = sm.getSelected();
+						Ext.Msg.confirm('<% _loc('Confirmation') %>', '<% _loc('Are you sure you want to delete the role') %>' + ' ' + sel.data.role + '?', 
+							function(btn){ 
+								if(btn=='yes') {
+									var conn = new Ext.data.Connection();
+									conn.request({
+										url: '/role/delete',
+										params: { id_role: sel.data.id },
+										success: function(resp,opt) { grid.getStore().remove(sel); },
+										failure: function(resp,opt) { Ext.Msg.alert('<% _loc('Error') %>', '<% _loc('Could not delete the role') %>'); }
+									});	
+								}
+							} );
+					}
+				}),
+				'->'
+				]
+		});
+
+	grid.getView().forceFit = true;
+
+	grid.on("rowdblclick", function(grid, rowIndex, e ) {
+			var row = grid.getStore().getAt(rowIndex);
+            role_detail_edit( row.get('id') );
+		});		
+		
+	return grid;
+})();
+
+

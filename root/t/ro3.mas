@@ -1,0 +1,30 @@
+<pre>
+<%perl>
+    use SOAP::Lite;
+    SOAP::Lite->import(+trace => qw(debug));
+
+    use Baseliner::Utils;
+    _log "Conectando al WS de REgistro de Objetivos";
+	my $soap = SOAP::Lite->proxy( 'http://localhost:8088/mockRegistroObjetivosBinding', timeout=>20);
+    $soap->readable(1);
+	$soap->serializer()->register_ns( 'http://new.webservice.namespace', 'new');
+	$soap->serializer()->register_ns( "http://schemas.xmlsoap.org/soap/envelope/", 'soap');
+    $soap->ns('http://new.webservice.namespace');
+    my $res = $soap->comprobacion(  
+                SOAP::Data->name("RFC" => '123456' ),
+                SOAP::Data->name("usuario" => 'ROG2833Z' ),
+                SOAP::Data->name("entidad" => 'GBP' ),
+                SOAP::Data->name("oficina" => '0000' ),
+                SOAP::Data->name("equipo" => '123' ),
+                SOAP::Data->name("aplicacion" => 'GBP.0000' ),
+                SOAP::Data->name("operacion" => '1' ),
+                SOAP::Data->name("modo" => '1' ),
+    );
+    print $res->result . "\n\n";
+    use YAML;
+    print  Dump $res->body;
+    #print $res->body->{conformidad}->{codigo};
+    #print $res->body->{conformidad}->{mensaje};
+
+</%perl>
+

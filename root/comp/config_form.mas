@@ -1,0 +1,52 @@
+<%args>
+	$metadataKey => 'metadata'
+    $metadata => ''
+</%args>
+[
+<%perl>
+	use JavaScript::Dumper;
+	my $cnt = 0;
+	
+    if( $c->stash->{config} ) {  #it's an array of arrays!
+        for my $config ( @{ $c->stash->{config} || [] } ) {
+</%perl>
+                {
+                      xtype : "fieldset",
+                      autoHeight : true,
+                      title : "<% _loc( $config->desc || $config->key ) %>",
+                      collapsible: true,
+                      items : [
+%            for my $row ( @{ $config->metadata || [] } ) {
+%                $c->stash->{metadata_row} = $row;
+                          <& /comp/config_selector.mas, config=>$config &>
+%            }
+                      ]
+                },
+<%perl>
+        }
+    } else {  # just one config object
+        my @metadata_rows = @{ $metadata || $c->stash->{$metadataKey} || [] };
+        foreach my $row ( @metadata_rows ) {
+            $c->stash->{metadata_row} = $row;
+</%perl>
+
+            <& /comp/config_selector.mas &>
+
+<%perl>
+        } ## foreach metadata
+    }
+</%perl>
+% if( $c->stash->{ns} ) {		
+	{  xtype: 'hidden', name: 'ns', value: '<% $c->stash->{ns} %>' },
+% }
+% if( $c->stash->{bl} ) {		
+	{  xtype: 'hidden', name: 'bl', value: '<% $c->stash->{bl} %>' },
+% }
+	{  type: 'Submit', name: 'Sb' }
+]		
+
+<%filter>
+    s/,[\s|\t|\n]*\]/\]/g;
+</%filter>
+
+

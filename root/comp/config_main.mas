@@ -1,0 +1,294 @@
+<%perl>
+	use Baseliner::Utils;
+    use JavaScript::Dumper;
+</%perl>
+<%doc>
+{
+              xtype : "treepanel",
+              animate : true,
+              autoScroll : true,
+              containerScroll : true,
+              root : new Ext.tree.TreeNode({text:'Tree Root',draggable : false}),
+              dropConfig : {
+        appendOnly : true
+    }
+          }
+</%doc>
+
+(function(){
+   var delete_menu = new Ext.Button({ title: 'Delete', label: 'Me' });
+
+   var baselines = new Ext.data.SimpleStore({ 
+       fields: ['bl', 'name'], 
+       data : <% js_dumper( $c->stash->{baselines} ) %>
+   }); 
+
+   var bl_combo = new Ext.form.ComboBox({
+            name: 'bl', 
+            hiddenName: 'bl',
+            fieldLabel: '<% _loc('Baseline') %>', 
+            mode: 'local', 
+            store: baselines, 
+            valueField: 'bl',
+            value: '<% $c->stash->{baselines}->[0]->[0] %>',
+            displayField:'name', 
+            editable: false,
+            forceSelection: true,
+            triggerAction: 'all',
+            allowBlank: false,
+            listeners: {
+               select: { fn: function(combo,rec,index){
+                    var form = config_tabs.getActiveTab();
+                    if( form!=undefined && form.getXType()=='form' ) {  //user may have selected without open forms
+                        //TODO warn the user if values have changed that they will be lost!
+                        form.getForm().load({
+                                 url:  '/config/json',
+                                 params: { bl: rec.data.bl  }
+                        });
+                    }
+               } }
+            },
+            width: 120 
+    });
+
+    var config_tabs = new Ext.TabPanel({
+        region: 'center',
+        layoutOnTabChange:true,
+        deferredRender: false,
+        autoScroll: true,
+        enableTabScroll: true,
+        tbar: [
+            bl_combo,
+            '->',
+            {   xtype:'button',
+                icon: '/static/images/drop-yes.gif',
+                cls: 'x-btn-text-icon',
+                handler: function() {
+                    // Save the form
+                    var form = config_tabs.getActiveTab();
+                    if( form!=undefined && form.getXType()=='form' ) {  //user may have selected without open forms
+                        var bl = bl_combo.getValue();
+                        form.getForm().submit({
+                            params: { bl: bl_combo.getValue() },
+                            success: function(form,action) {
+                                Baseliner.message( form.title, "<% _loc('Form data saved') %>");
+                            }
+                        });
+                    }
+                },
+                text: '<% _loc('Save') %>'
+            }
+        ], 
+        items : [{
+                  xtype : "panel",
+                  title : "<% _loc('Main') %>"
+              }],
+        activeTab : 0
+    });
+
+    var ns_tree = new Ext.tree.TreePanel({
+        useArrows:true,
+        autoScroll: true,
+        animate: true,
+        containerScroll: true,
+        dataUrl: '/ns/tree',
+        root: {
+            nodeType: 'async',
+            text: '/',
+            draggable:false,
+            id:'root'
+        }
+    });
+    ns_tree.expand();
+
+    // Create form fields with delete buttons
+    var t = new Ext.Template(
+        '<div class="x-form-item {5}" tabIndex="-1">',
+            '<label for="{0}" style="{2}" class="x-form-item-label">{1}{4}',
+            '<img src="/static/images/del_field.gif" border=0 style="display:inline;"></img></label>',
+            '<div class="x-form-element" id="x-form-el-{0}" style="{3}">',
+            '</div><div class="{6}"></div>',
+        '</div>'
+    );
+    t.disableFormats = true;
+    t.compile();
+    //Ext.override(Ext.layout.FormLayout, {
+        //fieldTpl: t
+    //});
+
+
+    ns_tree.on('dblclick', function(node,e) {
+        //add tab for this ns
+        if( ! node.isLeaf() && node.text!='/' ) return;
+        var ns = node.text=='/' ? '/' : node.parentNode.text + '/' + node.text;
+        var bl = bl_combo.getValue();
+		Ext.Ajax.request({
+			url: '/config/ns_panel',
+            params: { ns: ns },
+			success: function(xhr) {
+
+ 				try {
+					var items = eval(xhr.responseText);
+
+                    var ns_form = new Ext.FormPanel({
+                        title: node.text,
+                        url: '/config/submit',
+                        items: items,
+                        defaults: { width: 300 },
+                        labelWidth: 150,
+                        autoHeight: true,
+                        autoScroll: true,
+                        autoWidth: true,
+                        closable: true
+                    });
+                    ns_form.add({ xtype:'hidden', name: 'ns', value: ns });
+
+                    // Add form to tabpanel
+                    var tab = config_tabs.add(ns_form);
+
+                    ns_form.doLayout(true);
+                    config_tabs.setActiveTab(ns_form);
+                    config_tabs.doLayout(true);
+                    ns_form.getForm().load({
+                             url:  '/config/json',
+                             params: { ns: ns, bl: bl }
+                    });
+                    ////////// Setup the Drop Target - now that the window is shown
+                    var panelDropTarget = new Ext.dd.DropTarget( ns_form.getEl() , {
+                            ddGroup    : 'secondGridDDGroup',
+                            notifyDrop : function(dd, e, data){
+                                    var node = dd.dragData.node;
+                                    var already_warned = false;
+                                    var add_node = function(nodes) {
+                                        //Baseliner.ajaxEval( '/config/ns_panel', { ns: ns, filter: [ node.id ] }, function(obj) 
+                                        if( nodes.length < 1 ) return;
+                                        var node = nodes.shift();
+                                        Baseliner.ajaxEval( '/config/field', { key:  node.id }, function(arr) {
+                                                try {
+                                                    var obj = arr[0];  
+                                                    obj.labelWidth = 150;
+                                                    var fs_name = node.parentNode.text; // the config set name
+                                                    var done = false;
+                                                    ns_form.findBy(function(fs){
+                                                        if( fs.itemId == fs_name ) { // found the fieldset
+                                                            // now check if the field is not in there already
+                                                            fs.findBy(function(field) {
+                                                                if( field.name == node.id ) {  // found the field
+                                                                    Ext.Msg.alert("<% _loc('Error') %>", "<% _loc('Field already in the form: ') %>" + node.text );
+                                                                    field.focus();
+                                                                    done = true;
+                                                                }
+                                                            });
+
+                                                            if( done ) { add_node( nodes ); return; }
+
+                                                            // ok, add the field to the fieldset
+                                                            fs.add( obj );
+                                                            fs.doLayout(true);
+                                                            ns_form.doLayout(true);
+                                                            done = true;
+                                                        }
+                                                    });
+
+                                                    if( done ) { add_node( nodes ); return; }
+
+                                                    // not in the form already, create a fieldset with the field then...
+                                                    Baseliner.ajaxEval( '/config/ns_panel', { ns: ns, filter: [ node.id ] }, function(obj) {
+                                                        obj[0].labelWidth = 150;
+                                                        var fs = ns_form.add( obj[0] );
+                                                        ns_form.doLayout(true);
+                                                        fs.doLayout(true);
+                                                        add_node( nodes );
+                                                        return;
+                                                    });
+                                                } catch(err) {
+                                                    Ext.Msg.alert("<% _loc('Error') %>", "<% _loc('Error while adding field: ') %>" + node.text );
+                                                };
+                                        });
+                                    };
+
+                                    var children = new Array();
+                                    if( node.leaf ) {
+                                        children.push( node );
+                                    } else {
+                                        node.expand();
+                                        node.eachChild( function(child) {
+                                            if( ! child.disabled ) {
+                                                children.push( child );
+                                                //add_node( child );
+                                             }
+                                        });
+                                    }
+                                    add_node( children );
+                                    return true;
+                            }
+                    });
+				} catch(err) {
+					if( xhr.responseText.indexOf('dhandler') > -1 ) {
+						Ext.Msg.alert("Error: ", xhr.responseText );
+					} else {
+                        var str=""; 
+                        for(var i in err) {
+                            str+="<li>" + i + "=" + err[i]; 
+                        }
+                        var res = xhr.responseText;
+                        res.replace(/\</,'&lt;');
+                        res.replace(/\>/,'&gt;');
+                        str += "<hr><pre>" + res;
+						Baseliner.errorWin("<% _loc('Error Rendering Tab Component') %>", str);
+					}
+				}
+			},
+			failure: function(xhr) {
+				var win = new Ext.Window({ layout: 'fit', 
+					autoScroll: true, title: "<% _loc('Form creation failed') %>", 
+					height: 600, width: 600, 
+					html: 'Server communication failure:' + xhr.responseText });
+				win.show();
+			}
+		});
+
+    });
+
+    var config_tree = new Ext.tree.TreePanel({
+        useArrows: true,
+        autoScroll: true,
+        animate: true,
+        enableDrag: true,
+        ddGroup: 'secondGridDDGroup',
+        rootVisible: false,
+        containerScroll: true,
+        dataUrl: '/config/tree',
+        root: {
+            nodeType: 'async',
+            text: '/',
+            draggable:false,
+            id:'root'
+        }
+    });
+
+    var panel = new Ext.Panel({
+      layout : "border",
+      title  : '<% _loc('Config Matrix') %>',
+      items : [    config_tabs,   
+      {
+          region : "west",
+          title : "<% _loc('Infrastructure') %>",
+          width : 300,
+          autoScroll: true,
+          split : true,
+          collapsible : true,
+          items : [ ns_tree ]
+      },
+      {
+          region : "east",
+          title : "<% _loc('Configuration Items') %>",
+          width : 300,
+          autoScroll: true,
+          split : true,
+          collapsible : true,
+          items : [ config_tree ]
+      }]
+    });
+    return panel;
+})();

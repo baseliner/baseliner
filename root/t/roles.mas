@@ -1,0 +1,14 @@
+<pre>
+<%perl>
+    #$c->user->set('actions', 111);
+    #$c->user->{actions} = 111;
+    #print $c->user->get('actions');
+    #print $c->user->has_action;
+    use YAML;
+    #print Dump $c->user->has_action;
+    #$c->user->actions({ 11 =>'aaa' });
+    print Dump $c->user->actions;
+    #print Dump $c->session->{actions};
+    #print $c->check_user_roles({});
+</%perl>
+

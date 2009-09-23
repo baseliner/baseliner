@@ -1,0 +1,43 @@
+<pre>
+<%perl>
+use SOAP::WSDL;
+#SOAP::Lite->import(+trace => qw(debug));
+
+    my $soap = SOAP::WSDL->new(
+        wsdl => 'file:/c:/TRABAJO/RO/ROBJ.wsdl',
+    );
+    my %data = ( 
+        "RFC" => '12345',
+        "usuario" => 'ROG2833Z',
+        "entidad" => 'GBP',
+        "oficina" => '0000',
+        "equipo" => '123',
+        "aplicacion" => 'GBP.0000',
+        "operacion" => '1',
+        "modo" => '1',
+    );
+    my $result = $soap->call('comprobacion', \%data);
+    print $result;
+
+
+</%perl>
+<%doc>
+	my $soap = SOAP::Lite->proxy( 'http://localhost:8088/mockRegistroObjetivosBinding', timeout=>20);
+	$soap->serializer()->register_ns( 'http://new.webservice.namespace', 'new');
+    $soap->set_prefix('ns2');
+	my $data = SOAP::Data->value(
+                SOAP::Data->name("RFC" => '123456' ),
+                SOAP::Data->name("usuario" => 'ROG2833Z' ),
+                SOAP::Data->name("entidad" => 'GBP' ),
+                SOAP::Data->name("oficina" => '0000' ),
+                SOAP::Data->name("equipo" => '123' ),
+                SOAP::Data->name("aplicacion" => 'GBP.0000' ),
+                SOAP::Data->name("operacion" => '1' ),
+                SOAP::Data->name("modo" => '1' ),
+	);
+    print $soap->request;
+	my $som = $soap->comprobacion( $data->prefix('new') );
+    use YAML;
+    print Dump $som->body;
+
+</%doc>

@@ -1,0 +1,102 @@
+<%args>
+	$componentId => 'itemList'
+</%args>
+(function(theForm<% $c->stash->{$componentId}{id} %>){
+    // shorthand alias
+    var fm<% $c->stash->{$componentId}{id} %> = Ext.form;      
+    var cm<% $c->stash->{$componentId}{id} %> = new Ext.grid.ColumnModel([{
+           id:'<% $c->stash->{$componentId}{id} %>',
+           header: "<% $c->stash->{$componentId}{header} %>",
+           dataIndex: '<% $c->stash->{$componentId}{itemName} %>',
+           width: <% $c->stash->{$componentId}{width} %>,
+           editor: new fm<% $c->stash->{$componentId}{id} %>.TextField({
+               allowBlank: false
+           })
+        }]);
+
+   // by default columns are sortable
+    cm<% $c->stash->{$componentId}{id} %>.defaultSortable = true;
+
+    // this could be inline, but we want to define the Plant record
+    // type so we can add records dynamically
+    var record<% $c->stash->{$componentId}{id} %> = Ext.data.Record.create([
+           {name: '<% $c->stash->{$componentId}{itemName} %>', type: 'string'}
+      ]);
+
+    // create the Data Store
+	var store<% $c->stash->{$componentId}{id} %> = new Ext.data.JsonStore({
+		url: '<% $c->stash->{$componentId}{json_url} %>',
+		root:'data',
+		fields: [ 
+			{  name: '<% $c->stash->{$componentId}{itemName} %>' }
+		]
+	});
+	
+	                 var rowSelMod<% $c->stash->{$componentId}{id} %>=new Ext.grid.RowSelectionModel({singleSelect:true}); 
+                         rowSelMod<% $c->stash->{$componentId}{id} %>.addListener('rowselect', 
+                                             function (grid, rowIndex, e) 
+                                             {
+                                           
+                                                var record = rowSelMod<% $c->stash->{$componentId}{id} %>.getSelected();
+                                                return record;
+                                            }
+                                );   
+
+    // create the editor grid
+    var grid<% $c->stash->{$componentId}{id} %> = new Ext.grid.EditorGridPanel({
+    	id: '<% $c->stash->{$componentId}{itemName} %>',
+    	name: '<% $c->stash->{$componentId}{itemName} %>[]',
+        store: store<% $c->stash->{$componentId}{id} %>,
+        cm: cm<% $c->stash->{$componentId}{id} %>,
+        sm: rowSelMod<% $c->stash->{$componentId}{id} %>,
+        width:<% $c->stash->{$componentId}{width} %>,
+        height:<% $c->stash->{$componentId}{height} %>,
+        autoExpandColumn:'<% $c->stash->{$componentId}{itemName} %>',
+        title:'<% $c->stash->{$componentId}{formLabel} %>',
+        frame:true,
+        clicksToEdit:1,
+
+        tbar: [{
+            text: '<% $c->stash->{$componentId}{newLabel} %>',
+            icon: '/static/ext/resources/images/default/dd/drop-add.gif',
+           	cls: 'x-btn-text-icon',
+            handler : function(){
+                var p = new record<% $c->stash->{$componentId}{id} %>({
+                    '<% $c->stash->{$componentId}{id} %>': '<% $c->stash->{$componentId}{newLabel} %>'
+                });
+                grid<% $c->stash->{$componentId}{id} %>.stopEditing();
+                store<% $c->stash->{$componentId}{id} %>.insert(0, p);
+                grid<% $c->stash->{$componentId}{id} %>.startEditing(0, 0);
+            }},
+            {
+            text: '<% $c->stash->{$componentId}{delLabel} %>',
+            icon: '/static/ext/resources/images/default/dd/del.gif',
+           	cls: 'x-btn-text-icon',
+            handler : function(){     
+                var selectedRecord = grid<% $c->stash->{$componentId}{id} %>.getSelectionModel().getSelected();
+                if(selectedRecord!=null){
+                	grid<% $c->stash->{$componentId}{id} %>.getStore().remove(selectedRecord);
+                }
+                
+            }
+        }]
+    });
+    
+    theForm<% $c->stash->{$componentId}{id} %>.addListener('beforeaction',
+                function(frm) {
+             		var myStore = store<% $c->stash->{$componentId}{id} %>;
+             		var vals = "";
+             		for(var i=0;i<myStore.getCount();i++){
+             			vals = vals + myStore.getAt(i).data.<% $c->stash->{$componentId}{id} %> + ";";
+             		}
+             		if(vals!="")
+             			frm.setValues({<% $c->stash->{$componentId}{id} %>:vals});
+                    
+                }
+        );
+
+    // trigger the data store load
+    store<% $c->stash->{$componentId}{id} %>.load();
+    
+    return grid<% $c->stash->{$componentId}{id} %>;
+});

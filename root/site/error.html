@@ -1,0 +1,28 @@
+<head>
+<link href="/static/metal/metal.css" rel="stylesheet" type="text/css" />
+<!-- Fixes the "margin: x auto" bug -->
+<script src="/static/metal/IEmarginFix.js" type="text/javascript"></script>
+</head>
+<body id="metal-div_main">
+<div id="metal-div_main"> 
+<div id="metal-container">
+	<div style="height: 15px"></div>
+    <div id="metal-content_top"></div>
+	<div id="metal-content_bg" >
+        <div id="metal-content">
+            <div id="metal-content_text">
+                <h1><% _loc('Error') %></h1>
+                <div style="height: 15px"></div>
+                <% _loc( $c->stash->{error_msg} ) %>
+            </div>
+        </div>
+    </div>
+    <div id="metal-content_bottom"></div>
+</div>
+</div>
+</body>
+<%filter>
+    s/;/<br>/g
+</%filter>
+
+

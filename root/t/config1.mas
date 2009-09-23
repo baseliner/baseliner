@@ -1,0 +1,5 @@
+<%perl>
+        my $prefs = $c->model('ConfigStore')->get('config.user.view.theme', ns=>"/user/JBGL304T");
+        use YAML;
+        print Dump $prefs;
+</%perl>

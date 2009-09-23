@@ -1,0 +1,137 @@
+(function(){
+	var store=new Ext.data.JsonStore({
+		root: 'data' , 
+		remoteSort: true,
+		totalProperty:"totalCount", 
+		id: 'rownum', 
+		url: '/endevor/list/pkgs_json',
+		fields: [ 
+			{  name: 'package' },
+			{  name: 'type' },
+			{  name: 'status' },
+			{  name: 'backout_status' },
+			{  name: 'backout_flag' },
+			{  name: 'description' },
+			{  name: 'env' }
+		]
+	});
+
+    <& '/comp/search_field.mas' &>
+
+		var ps = 15; //page_size
+		store.load({params:{start:0 , limit: ps}}); 
+
+		// create the grid
+		var grid = new Ext.grid.GridPanel({
+			title: '<% _loc('Endevor Packages') %>',
+			header: false,
+            stripeRows: true,
+			autoScroll: true,
+			autoWidth: true,
+			store: store,
+			viewConfig: [{
+					forceFit: true
+			}],
+			selModel: new Ext.grid.RowSelectionModel({singleSelect:true}),
+			loadMask:'true',
+			columns: [
+				{ header: '<% _loc('Package') %>', width: 150, dataIndex: 'package', sortable: true },	
+				{ header: '<% _loc('Type') %>', width: 150, dataIndex: 'type', sortable: true },	
+				{ header: '<% _loc('Status') %>', width: 200, dataIndex: 'status', sortable: true },	
+				{ header: '<% _loc('Description') %>', width: 200, dataIndex: 'description', sortable: true },	
+				{ header: '<% _loc('Environment') %>', width: 100, dataIndex: 'env', sortable: true },
+				{ header: '<% _loc('Backout Status') %>', width: 100, dataIndex: 'backout_status', sortable: true },	
+				{ header: '<% _loc('Backout Flag') %>', width: 80, dataIndex: 'backout_flag', sortable: true }	
+			],
+			autoSizeColumns: true,
+			deferredRender:true,
+			bbar: new Ext.PagingToolbar({
+								store: store,
+								pageSize: ps,
+								displayInfo: true,
+								displayMsg: 'Rows {0} - {1} de {2}',
+								emptyMsg: "No hay registros disponibles"
+						}),        
+			tbar: [ 'Buscar: ', ' ',
+				new Ext.app.SearchField({
+					store: store,
+					params: {start: 0, limit: ps},
+					emptyText: '<% _loc('<Enter your search string>') %>'
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Add') %>',
+					icon:'/static/images/drop-add.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						if (sm.hasSelection())
+						{
+							var sel = sm.getSelected();
+							Baseliner.addNewTab('/release/new?package=' + sel.data.package , '<% _loc('New Release') %>' );
+						} else {
+							Baseliner.addNewTab('/release/new' , '<% _loc('New Release') %>' );
+						};
+						
+					}
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Approve') %>',
+					icon:'/static/images/drop-yes.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						if (sm.hasSelection())
+						{
+							var sel = sm.getSelected();
+                            Ext.Msg.confirm('<% _loc('Confirmation') %>', '<% _loc('Are you sure you want to approve') %> ' + sel.data.package + '?', 
+                                function(btn){ 
+                                    if(btn=='yes') {
+                                        var conn = new Ext.data.Connection();
+                                        conn.request({
+                                            url: '/endevor/approve',
+                                            params: { action: 'delete', package: sel.data.package },
+                                            success: function(resp,opt) { grid.getStore().remove(sel); },
+                                            failure: function(resp,opt) { Ext.Msg.alert('<% _loc('Error') %>', '<% _loc('Could not approve the package.') %>'); }
+                                        });	
+                                    }
+                                } );
+						} else {
+							Ext.Msg.alert('Error', 'Falta seleccionar una fila');	
+						};
+						
+					}
+				}),
+				new Ext.Toolbar.Button({
+					text: '<% _loc('Delete') %>',
+					icon:'/static/images/del.gif',
+					cls: 'x-btn-text-icon',
+					handler: function() {
+						var sm = grid.getSelectionModel();
+						var sel = sm.getSelected();
+						Ext.Msg.confirm('<% _loc('Confirmation') %>', 'Are you sure you want to delete the release ' + sel.data.name + '?', 
+							function(btn){ 
+								if(btn=='yes') {
+									var conn = new Ext.data.Connection();
+									conn.request({
+										url: '/release/update',
+										params: { action: 'delete', id_rel: sel.data.id },
+										success: function(resp,opt) { grid.getStore().remove(sel); },
+										failure: function(resp,opt) { Ext.Msg.alert('<% _loc('Error') %>', '<% _loc('Could not delete the release.') %>'); }
+									});	
+								}
+							} );
+					}
+				}),
+				'->'
+				]
+		});
+
+		grid.on("rowdblclick", function(grid, rowIndex, e ) {
+			var r = grid.getStore().getAt(rowIndex);
+			Baseliner.addNewTab('/endevor/approve?package=' + r.get('id') , r.get('name') );
+		});		
+
+	return grid;
+})();
+
+

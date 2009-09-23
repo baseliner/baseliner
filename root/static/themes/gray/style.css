@@ -1,0 +1,42 @@
+@import "../../ext/resources/css/xtheme-gray.css";
+/*  Job Log Grid Rows */
+
+.level-row .x-grid3-cell-inner{
+    height: 25px;
+    vertical-align: middle;
+    color:black;
+}
+
+/* .x-grid3-row-selected .x-grid3-cell-inner { */
+.x-grid3-row-selected {
+    background-color: #A0B5C5; 
+}
+
+
+.info-odd { background-color: #BFCDD5;}
+.info-even { background-color: #CED6DC; }
+
+.warn-odd { background-color: #F5E8AE; }
+.warn-even { background-color: #F0EBD1; }
+
+.error-odd { background-color: #EDA69E; }
+.error-even { background-color: #F3CCC8; }
+
+.debug-odd { background-color: #D7E1DB; }
+.debug-even { background-color: #CADBD0; }
+
+/* .info-odd { background-color: #A0B5C5; }
+.info-even { background-color: #BBCBD5; }
+
+.warn-odd { background-color: #f5e289; }
+.warn-even { background-color: #faf0c0; }
+
+.error-odd { background-color: #ed887c; }
+.error-even { background-color: #f3b0a9; }
+
+.debug-odd { background-color: #A5CCB3; }
+.debug-even { background-color: #B2DBC0; }
+
+*/ 
+
+

@@ -1,0 +1,13 @@
+<pre>
+<%perl>
+    use YAML;
+    #my $job = $c->model('Baseliner::BaliJob')->search({ name=>'N.DESA00000187' })->first;
+    #print $job->is_not_running;
+    my @services = $c->model('Services')->search_for( 'scheduled'=>1 );
+    #print Dump $_ for @services;
+
+    my $last_run = $c->model('Baseliner::BaliJob')->search({ runner=>'service.job.runner.simple.chain' }, { order_by=>'starttime desc' })->first;
+    #print Dump $last_run;
+
+    print Dump $c->model('ConfigStore')->get( 'config.nature' );
+</%perl>

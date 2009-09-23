@@ -1,0 +1,8 @@
+<%perl>
+
+    #print $c->model('Registry')->search_for('service');
+    #print $c->model('Baselines')->name('DESA');
+    my @config = $c->model('Registry')->search_for('config');
+    print join ',',map { $_->key } @config;
+
+</%perl>

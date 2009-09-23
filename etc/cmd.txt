@@ -1,0 +1,23 @@
+# Useful commands
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema create=static dbi:SQLite:database=baseliner2.db 
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali dbi:Oracle://scm/XE uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_app dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_role dbi:Oracle:SCM.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_mess dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_log dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_job dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_calendar dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_chained dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_common dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Harvest DBIC::Schema Baseliner::Schema::Harvest create=static constraint=^har dbi:Oracle:TISO.WORLD wtscm1 wtscm1
+perl script/baseliner_create.pl model Harvest DBIC::Schema Baseliner::Schema::Harvest create=static constraint=^form dbi:Oracle:POPULAR.WORLD uharvest uharvest
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_app dbi:Oracle:POPULAR.WORLD uharvest uharvest
+
+perl script/baseliner_create.pl model Harvest DBIC::Schema Baseliner::Harvest create=static constraint=^form dbi:Oracle:POPULAR.WORLD uharvest uharvest
+
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Baseliner::Schema::Baseliner create=static constraint=^bali_request dbi:Oracle://scm/XE uharvest uharvest
+
+perl script/baseliner_create.pl model Baseliner DBIC::Schema Schema::Baseliner create=static constraint=^form dbi:Oracle:POPULAR.WORLD uharvest uharvest
+
+set DBIX_CLASS_STORAGE_DBI_DEBUG=1

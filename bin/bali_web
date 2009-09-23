@@ -1,0 +1,64 @@
+#!/bin/sh
+# starts the web server
+export NLS_LANG=SPANISH_SPAIN.UTF8
+export LIBPATH=$BASELINER_LIBPATH:$LIBPATH
+LOGDIR=$BASELINER_LOGHOME
+LOGFILENAME=bali_web
+NOW=`perl -MDateTime -le 'print DateTime->now()'`
+LOGFILEOLD=$LOGDIR/$LOGFILENAME_$NOW.log
+LOGFILE=$LOGDIR/$LOGFILENAME.log
+PIDFILE=$LOGDIR/bali_web.pid
+
+if [ "$1" = "start" ]; then
+    if [ "$1" != "" ]; then
+        shift 
+    fi
+    if [ -e $PIDFILE ]; then
+        FILE_PID=`cat $PIDFILE`
+        kill -0 $FILE_PID 2>/dev/null
+        if [ $? = 0 ]; then
+                echo "Server is already running."
+                exit 1;
+        else
+                rm $PIDFILE
+        fi
+    fi
+    mv "$LOGFILE" "$LOGFILEOLD"
+    echo "Log file: $LOGFILE"
+    cd $BASELINER_HOME
+    #nohup perl script/baseliner_server.pl $BASELINER_SERVER_ARGS $* > $LOGFILE 2>&1 &
+    CATALYST_ENGINE=HTTP::Prefork nohup perl script/baseliner_server.pl $BASELINER_SERVER_ARGS $* > $LOGFILE 2>&1 &
+    SERVER_PID=$!
+    echo $SERVER_PID > $PIDFILE
+    echo "Server started with pid: $SERVER_PID"
+    echo "Waiting for children to start...\c"
+    k=0
+    while [ $k -lt 10 ]
+    do
+        sleep 1
+        echo ".\c"
+        let k=k+1
+    done 
+    CHILDREN=`ps -ef|grep perl|grep baseliner_|perl -n -e 'next unless /$SERVER_PID/; @a=split / /; print \$a[2]," "'`
+    print "\nChildren started: " . $CHILDREN;
+elif [ "$1" = "stop" ]; then
+    if [ -e $PIDFILE ]; then
+        SERVER_PID=`cat $PIDFILE`
+        echo "Server pid: $SERVER_PID"
+        kill $SERVER_PID 2>/dev/null
+        if [ $? = 0 ]; then
+                echo "Server stopped."
+        else
+                echo "Server is not running."
+        fi
+        rm "$PIDFILE"
+    else
+        echo "Server was not running or no pid file. No action taken."
+    fi
+elif [ "$1" = "tail" ]; then
+    tail -f $LOGFILE
+else
+    print "Unkown operation $1"
+fi
+
+

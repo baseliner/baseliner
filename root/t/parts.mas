@@ -1,0 +1,18 @@
+<pre>
+<%perl>
+    use BaselinerX::Job::Elements;
+    use BaselinerX::CA::Harvest::CLI::Version;
+    my $es = new BaselinerX::Job::Elements;
+    $es->push_element( my $e =  new BaselinerX::CA::Harvest::CLI::Version(path=>'/aa/bb/ccEAR', mask=>'/apl/nat/project' ) );
+    $es->push_element(  new BaselinerX::CA::Harvest::CLI::Version(path=>'/xx/yy/ZZ', mask=>'/apl/nat/project' ) );
+    $es->push_element(  new BaselinerX::CA::Harvest::CLI::Version(path=>'\xx\yy\zz_EAR', mask=>'/apl/nat/project' ) );
+    $es->push_element(  new BaselinerX::CA::Harvest::CLI::Version(path=>'\xx\yy\zz.ear', mask=>'/apl/nat/project' ) );
+    my %p = $e->path_parts;
+    use YAML;
+    my $es2 = $es->cut_to_subset('apl', 'xx');
+    #print Dump $es;
+    #print join',',$es->list('project');
+    print "SUBAPL: " . join',',$es2->list('subapplication');
+    #print $e->subapplication;
+    #print BaselinerX::CA::Harvest::CLI::Version->new(path=>'\xx\yy\zz.ear', mask=>'/apl/nat/project' )->subapplication;
+</%perl>

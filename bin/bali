@@ -1,0 +1,7 @@
+#!/usr/bin/ksh
+cd $BASELINER_HOME
+export LIBPATH=$BASELINER_LIBPATH:$LIBPATH
+export NLS_LANG=SPANISH_SPAIN.UTF8
+# -X : no warnings for production environments
+perl -X script/bali_ws.pl $*
+

@@ -1,0 +1,25 @@
+<pre>
+<%perl>
+use SOAP::Lite;
+SOAP::Lite->import(+trace => qw(debug));
+
+	my $soap = SOAP::Lite->proxy( 'http://localhost:8088/mockRegistroObjetivosBinding', timeout=>20);
+	$soap->serializer()->register_ns( 'http://new.webservice.namespace', 'new');
+    $soap->set_prefix('new');
+	my $data = SOAP::Data->value(
+                SOAP::Data->name("new:RFC" => '123456' ),
+                SOAP::Data->name("new:usuario" => 'ROG2833Z' ),
+                SOAP::Data->name("new:entidad" => 'GBP' ),
+                SOAP::Data->name("new:oficina" => '0000' ),
+                SOAP::Data->name("new:equipo" => '123' ),
+                SOAP::Data->name("new:aplicacion" => 'GBP.0000' ),
+                SOAP::Data->name("new:operacion" => '1' ),
+                SOAP::Data->name("new:modo" => '1' ),
+	);
+    print $soap->request;
+	my $som = $soap->comprobacion( $data->prefix('new') );
+    use YAML;
+    print Dump $som->body;
+
+
+</%perl>

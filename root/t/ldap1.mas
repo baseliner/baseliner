@@ -1,0 +1,12 @@
+<pre>
+<%perl>
+    use YAML;
+    #print Dump $c->user;
+    #print Dump $c->config->{authentication}->{realms}->{ldap}->{store};
+    #print Dump $c->config->{authentication}->{realms}->{ldap_no_pw}->{store};
+    #our $users = Catalyst::Authentication::Store::LDAP::Backend->new($c->config->{authentication}->{realms}->{ldap}->{store});
+    #print Dump $users->get_user('ROG2833Z');
+   # print Dump $c->authenticate({ id=>'ROG2833Z' }, 'ldap');
+    #print Dump my $realm = $c->get_auth_realm('ldap');
+    print $c->user->username;
+</%perl>

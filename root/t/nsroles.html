@@ -1,0 +1,16 @@
+<pre>
+<%perl>
+    my $n = $c->model('Namespaces');
+    use YAML;
+    my $config = $c->registry->get('config.job');
+    print Dump $config->metadata_filter('config.job.name', 'config.job.jobid' );
+    foreach my $obj ( $n->does('JobItem') ) {
+        print '<hr>';
+        print $obj->path;
+        print '<hr>';
+        print $obj->state;
+        print '<hr>';
+        print Dump $obj;
+    }
+
+</%perl>

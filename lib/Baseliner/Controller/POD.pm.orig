@@ -1,0 +1,21 @@
+package Baseliner::Controller::POD; 
+=head1 
+use strict;
+use warnings;
+use base 'Catalyst::Controller::POD';
+use Baseliner::Plug;
+use Baseliner::Utils;
+
+register 'menu.admin.core.pod' => { label=>_loc('Documentation'), url_browser_window=>'/pod', title=>_loc('Documentation') };
+ 
+__PACKAGE__->config(
+        inc        => 1,
+        namespaces => [qw(Baseliner* Catalyst* Moose* Mason*)],
+        self       => 1,
+        dirs       => [qw()]
+        );
+
+=cut
+
+1;
+

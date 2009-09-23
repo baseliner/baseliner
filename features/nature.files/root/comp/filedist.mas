@@ -1,0 +1,203 @@
+(function(theForm){
+    // shorthand alias
+    var fm = Ext.form;      
+    var cm = new Ext.grid.ColumnModel([
+    	{
+           id:'filter',
+           header: "Filtro",
+           dataIndex: 'filter',
+           width: 100
+        },
+    	{
+           id:'isrecursive',
+           header: "Recursivo?",
+           dataIndex: 'isrecursive',
+           width: 70
+        },
+    	{
+           id:'src_dir',
+           header: "Directorio Origen",
+           dataIndex: 'src_dir',
+           width: 200
+        },        
+    	{
+           id:'dest_dir',
+           header: "Directorio Destino",
+           dataIndex: 'dest_dir',
+           width: 200
+        },         
+    	{
+           id:'ssh_host',
+           header: "SSH user@host",
+           dataIndex: 'ssh_host',
+           width: 100
+        },  
+    	{
+           id:'xtype',
+           header: "Tipo",
+           dataIndex: 'xtype',
+           width: 50
+        }                     
+        ]);
+
+   // by default columns are sortable
+    cm.defaultSortable = true;
+
+    // this could be inline, but we want to define the Plant record
+    // type so we can add records dynamically
+    var rec = Ext.data.Record.create([
+           {name: 'id', type: 'string'},
+           {name: 'ns', type: 'string'},
+           {name: 'bl', type: 'string'},
+           {name: 'filter', type: 'string'},
+           {name: 'isrecursive', type: 'string'},
+           {name: 'src_dir', type: 'string'},
+           {name: 'dest_dir', type: 'string'},
+           {name: 'ssh_host', type: 'string'},
+           {name: 'xtype', type: 'string'}
+      ]);
+
+    // create the Data Store
+	var store = new Ext.data.JsonStore({
+		url: '<% $c->stash->{url_filedist_store} %>',
+		root:'data',	
+		fields: [ 
+           {name: 'id', type: 'string'},
+           {name: 'ns', type: 'string'},
+           {name: 'bl', type: 'string'},
+           {name: 'filter', type: 'string'},
+           {name: 'isrecursive', type: 'string'},
+           {name: 'src_dir', type: 'string'},
+           {name: 'dest_dir', type: 'string'},
+           {name: 'ssh_host', type: 'string'},
+           {name: 'xtype', type: 'string'}
+		]
+	});
+	
+    // create the editor grid
+    var grid = new Ext.grid.GridPanel({
+    	id: 'mappings',
+    	name: 'mappings[]',
+        store: store,
+        cm: cm,
+        sm: new Ext.grid.RowSelectionModel({
+                singleSelect: true,
+                listeners: {
+                     rowselect: function(smObj, rowIndex, record) {   
+                         return record;
+                    }
+               }}),
+        width: 750,
+        height: 200,
+        title:'Mapeo de ficheros',
+        frame:true,
+
+        tbar: [{
+            text: 'Insertar Mapeo',
+            icon: '/static/images/drop-add.gif',
+           	cls: 'x-btn-text-icon',
+            handler : function(){
+            	win.setTitle('Nuevo mapeo de ficheros');
+            	getFormFileDist().getForm().reset();
+                win.show();
+            }},
+            {
+            text: 'Editar Mapeo',
+            icon: '/static/images/drop-yes.gif',
+           	cls: 'x-btn-text-icon',
+            handler : function(){
+            	win.setTitle('Editar mapeo seleccionado');
+            	var selectedRecord = grid.getSelectionModel().getSelected();
+            	getFormFileDist().getForm().loadRecord(selectedRecord);
+            	//var hiddens = getFormFileDist().findByType('hidden');
+            	//for(var x=0;x < hiddens.length;x++)hiddens[x].fireEvent('change',null);
+                //añadir al grid y submit
+                win.show();
+            }},
+                        
+            {
+            text: 'Eliminar Mapeo',
+            icon: '/static/images/del.gif',
+           	cls: 'x-btn-text-icon',
+ 			handler : function(){     
+                var selectedRecord = grid.getSelectionModel().getSelected();
+                grid.el.mask('Actualizando', 'x-mask-loading');
+			
+			    Ext.Ajax.request({
+			        url    : '<% $c->stash->{url_filedist_delete} %>',
+			        params :  {
+			            id  : selectedRecord.data.id
+			        },
+			        success : function() {
+			            grid.getStore().remove(selectedRecord);
+			            grid.el.unmask();
+			        }
+			    });
+            }
+        }]
+    });
+
+    // trigger the data store load
+    store.load();
+    
+  
+    theForm.add(grid);
+
+
+      var formFileDist = new Ext.FormPanel( {
+      			 id: 'formFileDist',
+                 border    : false,
+                 frame		: true,
+                 url      : '<% $c->stash->{url_filedist_submit} %>',
+                 items     :  <& /comp/config_form.mas, metadataKey => 'metadata_filedist' &>
+             }
+        );      
+        
+		//creamos la ventana que contendrá el formulario  
+		var win = new Ext.Window({  
+		    title: 'Nuevo mapeo de ficheros',  
+		    width:450,  
+		    height:450, 
+		    autoScroll: true,
+		    closeAction: "hide",
+		    resizable: false,
+			layout: 'fit',
+		    items:formFileDist, //le asignamos el formulario solamente  
+		    buttonAlign: 'right', //botones alineados a la derecha  
+		    buttons:[{
+		    	text:'Guardar',
+			     handler : function() {  
+			         formFileDist.getForm().submit({  
+			             waitMsg : 'Salvando datos...',  
+			             failure: function (form, action) {  
+			                 Ext.MessageBox.show({  
+			                     title: 'Error al salvar los datos',  
+			                     msg: 'Error al salvar los datos.',  
+			                     buttons: Ext.MessageBox.OK,  
+			                     icon: Ext.MessageBox.ERROR  
+			                 });  
+			             },  
+			             success: function (form, request) {  
+			                 Ext.MessageBox.show({  
+			                     title: 'Datos salvados correctamente',  
+			                     msg: 'Datos salvados correctamente',  
+			                     buttons: Ext.MessageBox.OK,  
+			                     icon: Ext.MessageBox.INFO  
+			                 });
+			                 store.load();  
+			                 win.hide();
+			             }  
+			         });  
+			     }
+			     }	    	
+		    	,
+		    	{
+		    	text:'Cancelar', 
+		    	handler: function(){win.hide();}
+		    	}] //botones del formulario  
+		}); 
+		
+      function getFormFileDist(){ return formFileDist;}
+     	
+	return grid;
+});

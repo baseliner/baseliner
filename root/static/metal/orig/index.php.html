@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="ageye GBR" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<title>ageye.de: Windows Mobile software and games</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/prototype.js"></script>
+<script type="text/javascript" src="js/scriptaculous.js?load=effects,builder"></script>
+<script type="text/javascript" src="js/lightbox.js"></script>
+<link rel="stylesheet" href="css/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript"> <!--
+function Find()
+{
+	if (document.getElementById("uncrypt"))
+	{
+		var temp = Un(document.getElementById("uncrypt").title);
+		document.getElementById("uncrypt").innerHTML = '<a href="' + temp + '">' + temp.replace( /mailto:/, ''); + '</a>';
+		document.getElementById("uncrypt").title = temp.replace( /mailto:/, '');
+	}
+}
+function Un( s )
+{
+	var n = 0;
+	var r = "";
+	for( var i = 0; i < s.length; i++)
+	{
+		n = s.charCodeAt( i );
+		if( n >= 8364 )
+		{
+			n = 128;
+		}
+		r += String.fromCharCode( n - 1 );
+	}
+	return r;
+}
+
+function MUn( s )
+{
+	location.href=Un( s );
+}
+// --> </script>
+</head>
+
+<body onload="Find()">
+<div id="container">
+	<div id="head">
+    	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+        	<tr><td align="right" style="padding-top: 5px; padding-right: 5px;">			<a href="index.php?s=shop/status&l=en"><img src="gfx/sections/common/flag_en.png" border="0" title="english" alt="english" /></a> <a href="index.php?s=shop/status&l=en">English</a> <a href="index.php?s=shop/status&l=en"><img src="gfx/sections/common/flag_de.png" border="0" title="german" alt="german" /></a> <a href="index.php?s=shop/status&l=de">Deutsch</a></td></tr>
+            <tr>
+            	<td valign="top"><div id="logo"><img src="gfx/logo.png" alt="ageye" title="ageye" border="0" /></div></td>
+            </tr>
+        </table>
+    </div>
+    <div id="menu"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr height="63"><td><span id="menu_item"><a href="index.php?s=home" class="menu_item_nsel">Home</a></span><span id="menu_item"><a href="index.php?s=products" class="menu_item_nsel">Products</a></span><span id="menu_item"><a href="index.php?s=shop" class="menu_item_nsel">Shop</a></span><span id="menu_item"><a href="index.php?s=download" class="menu_item_nsel">Download</a></span><span id="menu_item"><a href="index.php?s=contact" class="menu_item_nsel">Contact</a></span></td><td align="right"><form action="index.php" method="get"><input type="hidden" name="s" value="search" /><input id="styled_search" type="text" name="search" value="Search" onFocus="if (this.value=='Search') { this.value = ''; };this.className='selected';" onBlur="this.className='';if (this.value=='') { this.value = 'Search'; };" onSelect="this.className='selected';if (this.value=='Search') { this.value = ''; };" style="margin-right: 20px;" /></form></td></tr></table></div>
+	<div style="height: 15px"></div>            <div id="content_top"></div>
+	<div id="content_bg">
+		<div id="content"><div id="content_text"><h1>Status</h1>
+<p>Please provide your e-mail address and tracking number. If you don't know your number, <a href="index.php?s=contact">contact</a> us and tell us the e-mail address of your purchase.</p>
+<form action="index.php?s=shop/status" method="post">
+<input type="hidden" name="post" value="true" />
+<table border="0" cellpadding="4">
+<tr><td><strong>Tracking number:</strong>*</td>
+<td><input id="styled" type="text" name="invoice" onFocus="this.className='selected'" onBlur="this.className=''" onSelect="this.className='selected'" /></td></tr>
+<tr><td><strong>E-mail:</strong>*</td>
+<td><input id="styled" type="text" name="email" onFocus="this.className='selected'" onBlur="this.className=''" onSelect="this.className='selected'" /></td></tr>
+</table>
+<div align="center"><input type="submit" value="OK" /></div>
+</form></div>
+		</div>
+	</div>
+	<div id="content_bottom"></div>
+        <div id="footer"><a href="index.php?s=termsandconditions">Terms and conditions</a> | <a href="index.php?s=returnpolicy">Return policy</a> | <a href="index.php?s=privacypolicy">Privacy policy</a> | <a href="index.php?s=imprint">Imprint</a> | <a href="index.php?s=shop/faq">Frequently asked questions</a> | <a href="index.php?s=partner">Partner</a> | <a href="index.php?s=shop/status">Order status</a> | <a href="http://forum.ageye.de" target="_blank">Forum</a><br />&copy; 2009 ageye GbR</div>
+</div>
+</body>
+</html>

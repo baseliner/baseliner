@@ -1,0 +1,13 @@
+<pre>
+<%perl>
+    use DateTime;
+    use DateTime::Format::Strptime;
+    my $parser = DateTime::Format::Strptime->new( pattern => '%H:%M' );
+    say $parser->parse_datetime( '22:21' );
+
+    use Baseliner::Utils;
+    my $dt = parse_dt('%H:%M', '22:55' );
+    $dt->day(22);
+    say $dt;
+
+</%perl>

@@ -1,0 +1,29 @@
+<%args>
+    $title  => ''
+    $heading  => ''
+    $message 
+</%args>
+% $title ||= _loc('Baseliner');
+% $heading ||= _loc('Error');
+
+<head>
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="<% $c->uri_for('/plain/style.css') %>" />
+    <title><% $title %></title>
+</head>
+
+<body>
+    <div class='box'>
+        <div class="error">
+            <h2><% $heading %></h2>
+        </div>
+    </div>
+    <div class='box'>
+        <div class="trace error">
+            <b><% $message %></b>
+        </div>
+    </div>
+
+</body>
+

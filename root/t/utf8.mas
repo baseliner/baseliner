@@ -1,0 +1,13 @@
+<pre>
+<%perl>
+    use Encode qw( decode_utf8 encode_utf8 is_utf8 _utf8_on _utf8_off  );
+
+    sub _utf8 {
+        my $msg = shift;
+        is_utf8($msg) ? $msg : decode_utf8($msg);
+    }
+
+    print '<li>Añora ';
+    print '<li>UTF8: ' . is_utf8( _utf8_on 'Añora');
+    print '<li>UTF8 2: ' . is_utf8( decode_utf8 'Añora');
+</%perl>

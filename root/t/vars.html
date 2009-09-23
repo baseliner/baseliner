@@ -1,0 +1,15 @@
+<pre>
+<%perl>
+    print YAML::Dump $c->model('ConfigStore')->get('config.user.view.theme', ns=>'user/ROG2833Z', bl=>'DESA', vars=>{ nombre=>'rod' }, value=>0 );
+    print "\n";
+    print YAML::Dump $c->model('Namespaces')->get('harvest.package/GBP.328.N-000002_carga_inicial'); 
+    print YAML::Dump $c->model('Namespaces')->get('harvest.package/GBP.328.N-000002_carga_inicial')->parents; 
+
+    print YAML::Dump $c->model('ConfigStore')->get(
+            'config.nature.j2ee.deploy',
+            ns=>'harvest.package/GBP.328.N-000002_carga_inicial',
+            #ns=>'application/GBP.0000',
+            bl=>'*',
+            #bl=>'DESA',
+            );
+</%perl>
