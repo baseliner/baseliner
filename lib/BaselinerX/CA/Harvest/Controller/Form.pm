@@ -164,6 +164,7 @@ sub form_meta : Path('/scm/servlet/harweb.Form') {
     if( $p->{USER_NAME} ) {  #TODO check for referer 'harvest'
         $username = decode_base64($p->{USER_NAME});
         $user = $c->authenticate({ id=>$username }, 'ldap_no_pw');
+		$c->session->{user} = new Baseliner::Core::User( user=>$c->user, username=>$username );
     }
     if( defined $c->user ) {
         $c->forward( 'xml_to_extjs' );

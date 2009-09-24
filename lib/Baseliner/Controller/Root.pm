@@ -49,7 +49,7 @@ sub begin : Private {
 
 sub whoami : Local {
     my ( $self, $c ) = @_;
-    $c->res->body( $c->user->username || $c->user->id );
+    $c->res->body( $c->user->username  );
 
 }
 
@@ -87,7 +87,7 @@ sub index:Private {
     # load menus
     my @menus;
     if( $c->user ) {
-		my @actions = $c->model('Permissions')->list( username=> $c->user->username || $c->user->id );
+		my @actions = $c->model('Permissions')->list( username=> $c->username );
         $c->stash->{menus} = $c->model('Menus')->menus( allowed_actions=>[ @actions ]);
     }
     $c->stash->{template} = '/site/index.html';

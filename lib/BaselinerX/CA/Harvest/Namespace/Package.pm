@@ -15,7 +15,7 @@ sub BUILDARGS {
 
     if( defined ( my $row = $_[0]->{row} ) ) {
         my @related;
-        push @related, '/apl/'.$row->envobjid->environmentname;
+        push @related, 'application/'.$row->envobjid->environmentname;
         my $info = _loc('State').': '.$row->state->statename."<br>" . _loc('Project').': '.$row->envobjid->environmentname."<br>" ;
 
         return {
@@ -101,14 +101,29 @@ sub state {
     return $state->statename;
 }
 
-sub parents {
+sub get_row {
     my $self = shift;
-    my $pkg = Baseliner->model('Harvest::Harpackage')->find({ packageobjid=>$self->ns_id }, { prefetch=>['envobjid'] });
-    my @parents;
+    return Baseliner->model('Harvest::Harpackage')->find({ packageobjid=>$self->ns_id }, { prefetch=>['envobjid'] });
+}
+
+sub application {
+    my $self = shift;
+    my $pkg = $self->get_row;
+    my $env = $pkg->envobjid->environmentname;
+    my $app = BaselinerX::CA::Harvest::Project::get_apl_code( $env );
+    return 'application/' . $app;
+}
+
+our @parents;
+sub parents {
+    return @parents if scalar @parents;
+    my $self = shift;
+    my $pkg = $self->get_row;
     my $env = $pkg->envobjid->environmentname;
     my $app = BaselinerX::CA::Harvest::Project::get_apl_code( $env );
     push @parents, "application/" . $app;
     push @parents, "harvest.project/" . $env;
+    push @parents, "/";
     return @parents;
 }
 

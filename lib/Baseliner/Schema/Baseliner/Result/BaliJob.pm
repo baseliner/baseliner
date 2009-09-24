@@ -122,12 +122,12 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     size => 50,
   },
-  "stash",
+  "id_stash",
   {
-    data_type => "BLOB",
+    data_type => "NUMBER",
     default_value => undef,
     is_nullable => 1,
-    size => 2147483647,
+    size => 126,
   },
 );
 __PACKAGE__->set_primary_key("id");
@@ -136,16 +136,49 @@ __PACKAGE__->has_many(
   "Baseliner::Schema::Baseliner::Result::BaliJobItems",
   { "foreign.id_job" => "self.id" },
 );
+__PACKAGE__->has_many(
+  "bali_job_stashes",
+  "Baseliner::Schema::Baseliner::Result::BaliJobStash",
+  { "foreign.id_job" => "self.id" },
+);
 
 
-# Created by DBIx::Class::Schema::Loader v0.04005 @ 2009-09-22 17:48:55
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5HNPKx1uhS2I4d354arbaA
+# Created by DBIx::Class::Schema::Loader v0.04005 @ 2009-09-23 17:13:55
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z0YN7JXRRnX2OVURxEwRHQ
 
 
-# You can replace this text with custom content, and it will be preserved on regeneration
 sub is_not_running {
     my $self = shift;
     return $self->status =~ m/READY|INEDIT|FINISHED|ERROR|KILLED/ ;
 }
+
+__PACKAGE__->might_have(
+  "job_stash",
+  "Baseliner::Schema::Baseliner::Result::BaliJobStash",
+  { "foreign.id" => "self.id_stash" },
+);
+
+# this is the best way to avoid having more than one stash per job
+#  and still maintain ref integrity 
+sub stash {
+    my ( $self, $data ) = @_;
+
+    if( defined $data && $data ) {
+        my $stash = $self->bali_job_stashes->find({ id=>$self->id_stash });
+        if( ref $stash ) {
+            $stash->stash( $data );
+        } else {
+            $stash = $self->bali_job_stashes->first
+              || $self->bali_job_stashes->create( { stash => $data } );
+        }
+        $stash->update;
+        $self->id_stash( $stash->id );
+        $self->update;
+    } else {
+        my $stash = $self->job_stash;
+        return ref $stash ? $stash->stash : undef;
+    }
+}
+
 
 1;

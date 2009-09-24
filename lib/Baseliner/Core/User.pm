@@ -1,8 +1,23 @@
 package Baseliner::Core::User;
 use Moose;
 use Baseliner::Utils;
+use Try::Tiny;
 
 #has 'actions' => ( is=>'rw', isa=>'HashRef', default=>sub{{}} );
+has 'user' => ( is=>'rw', isa=>'Any', );
+has 'username' => ( is=>'rw', isa=>'Str',  );
+
+sub BUILD {
+	my $self = shift;
+	if( ref $self->user && !$self->username ) {
+		try { $self->username( $self->user->username ) };
+		try { $self->username( $self->user->id ) };
+	}
+}
+
+sub email {
+#TODO find the best way to return an email address
+}
 
 sub reset_actions {
     my ($self) = @_;

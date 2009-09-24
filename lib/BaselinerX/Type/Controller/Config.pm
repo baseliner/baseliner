@@ -19,7 +19,7 @@ sub generate_form : Path('/config/generate_form') {
 	my $config = $c->registry->get( $config_key || 'config.nature.j2ee.build' );
 	$c->stash->{metadata} = $config->metadata;
 		
-	$c->stash->{template} = '/comp/config_form.mas';
+	$c->stash->{template} = '/comp/config/config_form.mas';
 }
 
 =head2 form
@@ -51,7 +51,7 @@ sub form_render : Private {
 	$c->forward('/baseline/load_baselines');
     $c->stash->{url_submit} = '/config/submit';
     $c->stash->{url_store} = '/config/json';
-	$c->stash->{template} = '/comp/config_panel.mas';
+	$c->stash->{template} = '/comp/config/config_panel.mas';
 }
 
 # saves form data
@@ -131,7 +131,7 @@ sub ns_panel : Local {
         push @filter, $c->model('ConfigStore')->filter_ns( $ns );
     }
     $c->stash->{metadata_filter} = [ @filter ];
-    $c->stash->{template} = '/comp/config_roll.mas';
+    $c->stash->{template} = '/comp/config/config_roll.mas';
 }
 
 sub field : Local {
@@ -146,13 +146,13 @@ sub field : Local {
         }
     }
 	$c->stash->{single_comp} = 1;
-	$c->stash->{template} = '/comp/config_selector.mas';
+	$c->stash->{template} = '/comp/config/config_selector.mas';
 }
 
 sub main : Local {
 	my ($self,$c)=@_;
 	$c->forward('/baseline/load_baselines');
-	$c->stash->{template} = '/comp/config_main.mas';
+	$c->stash->{template} = '/comp/config/config_main.mas';
 }
 
 1;

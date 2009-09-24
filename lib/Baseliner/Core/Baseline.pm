@@ -30,6 +30,7 @@ sub name {
     my $bl = shift;
     return $bl_text_cache{$bl} if defined $bl_text_cache{$bl}; 
 	my $r = Baseliner->model('Baseliner::BaliBaseline')->search({ bl=> $bl })->first;
+	return $bl unless ref $r;
 	return $bl_text_cache{$bl} = _loc($r->name) || $bl;
 }
 

@@ -22,11 +22,12 @@ use FindBin '$Bin';
 use Locale::Maketext::Simple (
 			Style => 'gettext',
 			Path => $Bin.'/../lib/Baseliner/I18N',
-			Decode => 1,
+			Decode => 0,
 		);
 use Carp;
 use DateTime;
 use YAML::Syck;
+use Class::MOP;
 use Sys::Hostname;
 use PadWalker qw(peek_my peek_our peek_sub closed_over);
 use strict;
@@ -103,6 +104,7 @@ sub _dump {
 
 use Encode qw( decode_utf8 encode_utf8 is_utf8 );
 sub _loc {
+    return unless $_[0];
     return loc( @_ );
     my $context = peek_my(1); ## try to get $c with PadWalker
     if( $context->{'$c'} && ref ${ $context->{'$c'} } ) {
@@ -112,8 +114,8 @@ sub _loc {
         return $msg;
     } else {
         my $msg = loc( @_ );
-        return $msg;
         #return _utf8($msg);
+        return $msg;
     }
 }
 

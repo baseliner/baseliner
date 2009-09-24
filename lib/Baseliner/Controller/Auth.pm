@@ -5,15 +5,15 @@ BEGIN { extends 'Catalyst::Controller'; }
 use Try::Tiny;
 use YAML;
 use MIME::Base64;
-use Baseliner::Role::User;
+use Baseliner::Core::User;
 
 sub go : Local {
     my ( $self, $c ) = @_;
     my $p = $c->req->params;
     if( $p->{USER_NAME} ) {  #TODO check for referer 'harvest'
-        my $login = decode_base64($p->{USER_NAME});
-        #$c->set_authenticated( 'default' , $login );  
-        $c->authenticate(  $login );  
+        my $username = decode_base64($p->{USER_NAME});
+        $c->authenticate({ id=>$username }, 'ldap_no_pw');
+		$c->session->{user} = new Baseliner::Core::User( user=>$c->user, username=>$username );
     }
     $c->forward('/index');
 }
@@ -24,6 +24,7 @@ sub login_local : Local {
 	my $auth = $c->authenticate({ id=>$c->stash->{login}, password=>$c->stash->{password} }, 'local');
 	if( ref $auth ) {
 		#Baseliner::Role::User->meta->apply( $c->user );
+		$c->session->{user} = new Baseliner::Core::User( user=>$c->user );
 		$c->stash->{json} = { success => \1, msg => _loc("OK") };
 	} else {
 		$c->stash->{json} = { success => \0, msg => _loc("Invalid User or Password") };
@@ -51,6 +52,7 @@ sub login : Global {
 					});
 			if( ref $auth ) {
 				$c->stash->{json} = { success => \1, msg => _loc("OK") };
+				$c->session->{user} = new Baseliner::Core::User( user=>$c->user );
 			} else {
 				$c->stash->{json} = { success => \0, msg => _loc("Invalid User or Password") };
 			}

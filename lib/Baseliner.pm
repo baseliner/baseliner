@@ -144,6 +144,7 @@ if( $dbh->{Driver}->{Name} eq 'Oracle' ) {
     Baseliner::Schema::Baseliner::Result::BaliConfig->sequence('bali_config_seq');
     Baseliner::Schema::Baseliner::Result::BaliJobItems->sequence('bali_job_items_seq');
     Baseliner::Schema::Baseliner::Result::BaliJob->sequence('bali_job_seq');
+    Baseliner::Schema::Baseliner::Result::BaliJobStash->sequence('bali_job_stash_seq');
     Baseliner::Schema::Baseliner::Result::BaliLog->sequence('bali_log_seq');
     Baseliner::Schema::Baseliner::Result::BaliMessage->sequence('bali_message_seq');
     Baseliner::Schema::Baseliner::Result::BaliMessageQueue->sequence('bali_message_queue_seq');
@@ -152,6 +153,7 @@ if( $dbh->{Driver}->{Name} eq 'Oracle' ) {
     Baseliner::Schema::Baseliner::Result::BaliRelease->sequence('bali_release_seq');
     Baseliner::Schema::Baseliner::Result::BaliRequest->sequence('bali_request_seq');
     Baseliner::Schema::Baseliner::Result::BaliRole->sequence('bali_role_seq');
+    Baseliner::Schema::Baseliner::Result::BaliWiki->sequence('bali_wiki_seq');
 }
 	
 	# Inversion of Control
@@ -240,6 +242,18 @@ if( $dbh->{Driver}->{Name} eq 'Oracle' ) {
                     $p{bl} ||= '*';
                     $c->model('Baseliner::Bigtable')->create({ ns=>$p{ns},bl=>$p{bl}, key=>$p{key}, value=>$p{value} }); 
                 }
+
+# user shortcut
+use Try::Tiny;
+sub username {
+	my $c = shift;
+	try { return $c->session->{user}->username };
+	try { return $c->user->username };
+	try { return $c->user->id
+	} catch {
+		return undef;	
+	};
+}
 
 # Utils
 sub uri_for_static {

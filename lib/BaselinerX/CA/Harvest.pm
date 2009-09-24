@@ -183,40 +183,6 @@ register 'config.harvest.nature' => {
 	],
 };
 
-register 'namespace.harvest.subapplication' => {
-	name	=>_loc('Harvest Subapplication'),
-	root    => 'application',
-    can_job => 0,
-	handler => sub {
-		my ($self, $c, $p) = @_;
-		my $rs = Baseliner->model('Harvest::Harpathfullname')->search(undef, { join=>['itemobjid'],prefetch =>['itemobjid'] });
-		my @ns;
-		my $config = Baseliner->registry->get('config.harvest.subapl')->data;
-		my $cnt = $config->{position};
-		while( my $r = $rs->next ) {
-			my $path = $r->pathfullname;
-			my @parts = split /\\/, $path;
-			next unless @parts == ($cnt+1); ## the preceding \ counts as the first item
-			my $subapl = $parts[$cnt];
-			my @envs = envs_for_item( $r->itemobjid->itemobjid );
-			for my $env ( @envs ) {
-				( my $env_short =  $env->{environmentname} )=~ s/\s/_/g;
-				push @ns, BaselinerX::CA::Harvest::Namespace::Subapplication->new({
-					ns      => 'harvest.subapplication/' . $subapl,
-					ns_name => $subapl,
-					ns_type => _loc('Harvest Subapplication'),
-					ns_id   => $env->{envobjid},
-					ns_parent => '/apl/' . $env_short,
-                    parent_class => [ 'application' ],
-					ns_data => { $r->get_columns },
-                    provider=> 'namespace.harvest.subapplication',
-				});
-			}
-		}
-		return \@ns;
-	},
-};
-
 register 'namespace.harvest.nature' => {
 	name	=>_loc('Harvest Nature'),
 	root    => 'nature',
