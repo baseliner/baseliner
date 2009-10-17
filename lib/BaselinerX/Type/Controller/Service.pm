@@ -1,11 +1,25 @@
 package BaselinerX::Type::Controller::Service;
 use Baseliner::Plug;
+use Baseliner::Utils;
+use Try::Tiny;
 BEGIN { extends 'Catalyst::Controller' };
 
 sub list_services : Path('/admin/type/service/list_services') {
 	my ($self,$c)=@_;
 	use YAML;
 	$c->res->body( "<pre>".Dump $c->registry->starts_with( 'service' ) );
+}
+
+sub rest : Local {
+	my ($self,$c)=@_;
+	my $p = $c->req->parameters;
+	try {
+		my $ret = $c->launch( $p->{service} );
+		$c->stash->{json} = { msg=>1 };
+	} catch {
+		$c->stash->{json} = { msg=>shift };
+	};
+	$c->forward('View::JSON');
 }
 
 sub launch : Regex('^service.') {

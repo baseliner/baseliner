@@ -149,6 +149,20 @@ sub output {
 	return $output;	
 }
 
+=head2 codepage( from_codepage, to_codepage )
+
+Changes the data codepage:
+
+   $mvs->codepage('IBM-1145', 'IBM-1252' )
+
+=cut
+sub codepage {
+	my ($self, $from, $to ) = @_;
+    die 'Missing parameter from' unless $from;
+    die 'Missing parameter to' unless $to;
+	$self->{jes}->quot('SITE', "SBD=($from,$to)" );
+}
+
 sub close {
 	my $self=shift;
 	for( $self->jobs ) {

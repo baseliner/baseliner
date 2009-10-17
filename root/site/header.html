@@ -5,9 +5,9 @@
 
 <%perl>
     my $prefs = {};
-    if( $c->user ) {
-        my $username = $c->user->username || $c->user->id ;
-        if( $username ) {
+    if( defined $c->user ) {
+        my $username = $c->username;
+        if( defined $username ) {
             $prefs = $c->model('ConfigStore')->get('config.user.view', ns=>"user/$username");
         }
     }
@@ -56,9 +56,9 @@ Ext.onReady(function(){
             '->','<img src="/static/images/icons/application_double.gif" style="border:0px;" onclick="Baseliner.detachCurrentTab()" onmouseover="this.style.cursor=\'hand\'" />',
             '-', 
             <%perl>
-                my $user = ref $c->user ? $c->user->username || $c->user->id : undef;
-                if( $user ) {
-                    print js_dumper { text=>$c->user->username || $c->user->id,
+                my $user = $c->username;
+                if( defined $user ) {
+                    print js_dumper { text=>$c->username ,
                                         menu=> [
                                                  { text=>_loc('Inbox'), handler=>\'function(){ Baseliner.addNewTabComp("/message/inbox", "Inbox" ); }' },
                                                  { text=>_loc('Preferences'), handler=>\'function(){ Baseliner.preferences(); }' },

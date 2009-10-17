@@ -79,7 +79,10 @@ sub index:Private {
             my $username = $c->user->username || $c->user->id;
             if( $username ) {
                 my $prefs = $c->model('ConfigStore')->get('config.user.global', ns=>"user/$username");
-                $c->language( $prefs->{language} || $c->config->{default_lang} );
+                $c->languages( [ $prefs->{language} || $c->config->{default_lang} ] );
+				if( ref $c->session->{user} ) {
+					$c->session->{user}->languages( [ $prefs->{language} || $c->config->{default_lang} ] );
+				}
             }
         }
     }

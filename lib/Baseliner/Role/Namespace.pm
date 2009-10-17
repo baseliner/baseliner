@@ -15,7 +15,7 @@ has 'provider' => ( is=>'rw', isa=>'Str' ); ## who generated this
 has 'related' => ( is=>'rw', isa=>'ArrayRef', default=>sub{[]} ); 
 has 'date' => ( is=>'rw', isa=>'Str', );  ## object last modified date
 
-has 'can_job' => ( is=>'rw', isa=>'Bool', default=>0 );  ## can it be included in a job?
+#has 'can_job' => ( is=>'rw', isa=>'Bool', default=>0 );  ## can it be included in a job?
 has 'why_not' => ( is=>'rw', isa=>'Str', );  ## if it cannot be included, why not? 
 
 #TODO requires 'name'; - name resolution in class

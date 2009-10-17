@@ -3,6 +3,7 @@ use Moose;
 extends qw/Catalyst::Model/;
 no Moose;
 use Baseliner::Utils;
+use Baseliner::Core::Registry;
 
 =head2 namespaces
 
@@ -22,6 +23,7 @@ sub namespaces {
         $p = { @_ };
     }
 	my @ns_list;
+
 	my @ns_prov_list = Baseliner::Core::Registry->starts_with('namespace');
 	for my $ns_prov ( @ns_prov_list ) {
 		my $prov = Baseliner::Core::Registry->get( $ns_prov );

@@ -61,6 +61,7 @@ sub get {
 	$p{ns} ||= '/';
 	$p{bl} ||= '*';
     my $data = $p{data} || {};
+    my $enforce_metadata = delete $p{enforce_metadata};
     my $long_key = $p{long_key};
 	my $rs = Baseliner->model('Baseliner::BaliConfig')->search({ key=>{ -or=>[ {-like=>"$key.%" } , {-like=>"$key" } ]  } });
     my %values;
@@ -88,7 +89,7 @@ sub get {
         eval { $config = Baseliner->registry->get( _cut(-1, '\.', $key ) ) };
         $single_key = 1 unless $@;
     }
-    if( defined $config ) {
+    if( defined $config && blessed($config) eq 'BaselinerX::Type::Config' ) {
         foreach my $item ( @{ $config->metadata || [] } ) {
             my $data_key = $long_key ? $key.$item->{id} : $item->{id};
 
@@ -123,7 +124,9 @@ sub get {
 
         }
     } else {
-        die _loc( "Could not find the metadata for the key '$key' in the registry." );
+        my $msg = _loc( "Could not find the metadata for the key '$key' in the registry." );
+        if   ($enforce_metadata) { die($msg) }
+        else                     { _loc($msg) }
     }
     
     if( $p{value} ) {
@@ -180,4 +183,20 @@ sub filter_ns {
     return keys %keys;
 }
 
+sub set {
+	my ($self,%p) = @_;
+	my $ns = $p{ns} || '/';
+	my $bl = $p{bl} || '*';
+	_throw 'Missing parameter key' unless $p{key};
+	_throw 'Missing parameter value' unless defined $p{value};
+	my $rs = Baseliner->model('Baseliner::BaliConfig')->search({ key=>$p{key}, ns=>$ns, bl=>$bl });
+	if( ref $rs ) {
+		while( my $r = $rs->next ) {
+			$r->delete;
+		}
+	} 
+	my $row = Baseliner->model('Baseliner::BaliConfig')->create({ key=>$p{key}, value=>$p{value}, ns=>$ns, bl=>$bl });
+	$row->update;
+	return $row;
+}
 1;

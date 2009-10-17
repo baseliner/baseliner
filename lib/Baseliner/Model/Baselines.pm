@@ -3,6 +3,7 @@ use Moose;
 extends qw/Catalyst::Component::ACCEPT_CONTEXT Catalyst::Model/;
 use Baseliner::Utils;
 use Carp;
+use Baseliner::Core::Baseline;
 
 our $AUTOLOAD;
 sub AUTOLOAD {

@@ -43,14 +43,7 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     size => 10,
   },
-  "data",
-  {
-    data_type => "BLOB",
-    default_value => undef,
-    is_nullable => 1,
-    size => 2147483647,
-  },
-  "ts",
+  "timestamp",
   {
     data_type => "DATE",
     default_value => "SYSDATE",
@@ -71,7 +64,23 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     size => 255,
   },
+  "data",
+  {
+    data_type => "BLOB",
+    default_value => undef,
+    is_nullable => 1,
+    size => 2147483647,
+  },
   "data_name",
+  {
+    data_type => "VARCHAR2",
+    default_value => undef,
+    is_nullable => 1,
+    size => 1024,
+  },
+  "data_length",
+  { data_type => "NUMBER", default_value => 0, is_nullable => 1, size => 126 },
+  "module",
   {
     data_type => "VARCHAR2",
     default_value => undef,
@@ -82,8 +91,8 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key("id");
 
 
-# Created by DBIx::Class::Schema::Loader v0.04006 @ 2009-08-21 11:03:12
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tTIY6fznfd4dNRT+H336mA
+# Created by DBIx::Class::Schema::Loader v0.04005 @ 2009-09-25 16:08:04
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YNQC7dlQmXAUsAvADXXOvw
 
 
 # You can replace this text with custom content, and it will be preserved on regeneration

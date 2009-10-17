@@ -42,17 +42,19 @@ sub BUILD {
 sub get {
     my $self = shift;
     my $item = shift;
+	my $module = $self->module;
 
-    if( my $code = $self->finder ) {
-        return $code->( $self, $item ); 
+    if( my $finder = $self->finder ) {
+        return $finder->( bless( $self, $module ), $item ); 
     }
 }
 
 sub list {
     my $self = shift;
+	my $module = $self->module;
 
-    if( my $code = $self->handler ) {
-        return $code->( $self ); 
+    if( my $handler = $self->handler ) {
+        return $handler->( bless($self, $module) ); 
     }
 }
 

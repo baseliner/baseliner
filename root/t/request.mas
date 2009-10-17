@@ -1,0 +1,48 @@
+<pre>
+<%perl>
+    use Baseliner::Core::DBI;
+    my $db = Baseliner::Core::DBI->new({ model=>'Baseliner' });
+    my $username = $p{username} || 'AABH671E';
+    my @requests = $db->array_hash(qq{
+            SELECT me.username, me.id_role, me.ns, actions.id_role, actions.action, actions.bl, request.*
+            FROM BALI_ROLEUSER me, BALI_ROLEACTION actions, BALI_REQUEST request  
+            WHERE actions.id_role = me.id_role
+            AND request.bl = actions.bl 
+            AND request.ns = me.ns 
+            AND request.action = actions.action
+            AND ( username = '$username' ) ORDER BY actions.id_role
+    });
+
+    print _dump( $_ ).  "\n" for @requests;
+
+    my $users = Baseliner->model('Baseliner::BaliRoleUser')->search(
+        { username=>'AABH671E' },
+        { join     => ['actions', ],
+        prefetch => ['actions', ] }
+    );
+    while( my $user = $users->next ) {
+        my $actions = $user->actions;
+        my @action;
+        while( my $action = $actions->next ) {
+            push @action, $action->;
+            push @bl, $
+        }
+        my $request = $c->model('Baseliner::BaliRequest')->search({
+            bl=>[ 
+            ns=>$user->ns,
+         });
+        while( my $r = $request->next ) {
+            print _dump( { $r->get_columns }), "\n";
+        }
+
+#            my $actions = $r->bali_roleactions;
+#            while( my $action = $actions->next ) {
+#                print _dump( { $action->get_columns } ). "\n" 
+#            }
+#            my $users = $r->bali_roleusers;
+#            while( my $user = $users->next ) {
+#                print _dump( { $user->get_columns } ). "\n";
+#            }
+    }
+</%perl>
+

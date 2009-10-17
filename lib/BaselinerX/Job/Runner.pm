@@ -3,8 +3,10 @@ use Baseliner::Plug;
 use Baseliner::Utils;
 use YAML::Syck;
 use Path::Class;
+use BaselinerX::Job::Elements;
 use Carp;
 use Try::Tiny;
+use utf8;
 
 #extends 'BaselinerX::Type::Service';
 
@@ -29,7 +31,6 @@ register 'config.job.runner' => {
 register 'service.job.run' => { name => 'Job Runner', config => 'config.job', handler => \&job_run, };
 register 'service.job.runner.simple.chain' => { name => 'Simple Chain Job Runner', config => 'config.job', handler => \&job_simple_chain, };
 register 'service.job.init' => { name => 'Job Runner Initializer', config => 'config.job.runner', handler => \&job_init, };
-register 'service.job.contents' => { name => 'Job Contents Runner', config => 'config.job.runner', handler => \&job_contents, };
 register 'service.job.approve' => { name => 'Job Approval', config => 'config.job.runner', handler => \&job_approve, };
 
 register 'action.notify.job.end' => { name=>_loc('Notify when job has finished') };
@@ -68,7 +69,12 @@ sub job_run {
 	$c->stash->{job} = $self;
 	$self->jobid( $jobid );
 	$self->logger( new BaselinerX::Job::Log({ jobid=>$jobid }) );
+
+	# trap all die signals
     $SIG{__DIE__} = \&_die;
+
+	# load job_items onto the stash
+	$self->job_contents;
 
 	_log "\n================================| Starting JOB=" . $jobid;
 
@@ -160,11 +166,19 @@ sub job_simple_chain {
     my $step = $job->job_stash->{step};
     _throw "Missing job chain step" unless $step;
 
-	my $chain = $c->model('Baseliner::BaliChain')->search({ id=> 1})->first;
+	my $chain_id = 1; #FIXME 
+	my $chain = $c->model('Baseliner::BaliChain')->search({ id=> $chain_id })->first;
+	_throw _loc( 'Missing default job chain id %1', $chain_id ) unless ref $chain;
 	my $rs_chain = $c->model('Baseliner::BaliChainedService')->search({ step=>$step, chain_id=>$chain->id, active=>'1' }, { order_by=>'seq' });
-	while( my $r = $rs_chain->next ) {
-		$log->debug('Running Service ' . $r->key);
-		$c->launch( $r->key );
+	while( my $service = $rs_chain->next ) {
+        try {
+            $log->debug( _loc('Starting chained service %1 for step %2' , $service->key, $step ) );
+            $c->launch( $service->key );
+            $log->debug( _loc('Finished chained service %1 for step %2' , $service->key, $step ) );
+        } catch {
+            my $error = shift;
+            _throw( _loc('Error while running chained service %1 for step %2: %3' , $service->key, $step, $error ) ); 
+        };
 	}
 }
 
@@ -188,13 +202,19 @@ sub job_init {
 }
 
 sub job_contents {
-	my ($self,$c,$config)=@_;
+	my ($self,$c)=@_;
 	
-	my $job = $c->stash->{job};
-	my $log = $job->logger;
+	my $log = $self->logger;
 
-	$log->debug( 'Job Contents cargando, path=' . $job->job_stash->{path} );
-	my $rs =$c->model('Baseliner::BaliJobItems')->search({ id_job=> $job->jobid }); 
+	# prepare the contents array (package list)
+    $self->job_stash->{contents} = [];
+
+	# prepare the elements object
+    $self->job_stash->{elements} = BaselinerX::Job::Elements->new;
+
+	# load the contents array
+	$log->debug( 'Job Contents cargando, path=' . $self->job_stash->{path} );
+	my $rs =$c->model('Baseliner::BaliJobItems')->search({ id_job=> $self->jobid }); 
 	my %services;
 	while( my $r = $rs->next ) {
 		$log->debug('Cargando contenido de pase para id=' . $r->id );
@@ -202,14 +222,15 @@ sub job_contents {
 		# load vars with contents
         my %job_items = $r->get_columns;
         $job_items{data} = YAML::Syck::Load( $job_items{data} ); # deserialize this baby
-		push @{ $job->job_stash->{contents} }, \%job_items;
+		push @{ $self->job_stash->{contents} }, \%job_items;
 
 		# group contents
 		$services{ $r->service } = 1;
 	}
 
 	# call each content service to prepare data for the RUN step
-    if( $job->job_data->{step} eq 'PRE' ) {
+	my $call_runners = 0;   # this is disabled and deprecated
+    if( $call_runners && $self->job_data->{step} eq 'PRE' ) {
         foreach my $service ( keys %services ) {
             next unless $service;
             $log->debug('Iniciando servicio de contenido de pase: ' . $service );
@@ -222,7 +243,7 @@ sub job_contents {
             }
         }
     }
-    $log->debug( 'Contenido del stash del pase', data_name=>'Job Stash', data=>Dump $job->job_stash );
+    $log->debug( 'Contenido del stash del pase', data_name=>'Job Stash', data=>Dump $self->job_stash );
 }
 
 sub job_approve {
@@ -234,10 +255,9 @@ sub job_approve {
     my $bl = $job->job_data->{bl};
     $log->debug( "Verificando si hay aprobaciones para $bl" );
 
-    use utf8;
     for my $item ( _array $job->job_stash->{contents} )  {
         my $item_ns = 'endevor.package/' . $item->{item};   #TODO get real ns names
-        $log->info( "Pidiendo aprobación para el pase en la linea base $bl, item $item_ns" );
+        $log->info( _loc('Requesting approval for baseline %1, item %2', $bl, $item_ns ) );
             Baseliner->model('Request')->request(
                 name   => 'Aprobación del pase N.DESA1029210',
                 action => 'action.job.approve',

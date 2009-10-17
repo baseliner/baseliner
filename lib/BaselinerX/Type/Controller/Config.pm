@@ -87,10 +87,12 @@ sub json : Local {
         my $ns = $c->request->params->{ns};
         my $bl = $c->request->params->{bl};
         my @keys = $c->model('ConfigStore')->filter_ns( $ns );  
-        foreach( @keys ) {
-            my $d = $c->model('ConfigStore')->get( $_, ns=>$ns, bl=>$bl, long_key=>1 );
-            my %merge = ( %{ $data || {} }, %{ $d || {} } );
-            $data = \%merge;
+        foreach my $key ( @keys ) {
+            my $inf = $c->model('ConfigStore')->get( $key , ns=>$ns, bl=>$bl, long_key=>1 );
+            if( defined $inf ) {
+                my %merge = ( %{ $data || {} }, %{ $inf || {} } );
+                $data = \%merge;
+            }
         }
     }
     $c->stash->{json} = { success=>\1, data => $data };  
@@ -110,7 +112,7 @@ sub config_tree : Path('/config/tree') {
         }
         push @tree, { id=>$config_key, leaf=>\0, text=>($config->{name} || $config_key), attributes=>{ key=>$config_key }, children=> \@children };
     }
-    $c->stash->{json} = \@tree;
+    $c->stash->{json} = [ sort { $a->{text} cmp $b->{text} } @tree ];
     $c->forward("View::JSON");
 }
 

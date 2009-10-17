@@ -2,9 +2,16 @@ package BaselinerX::Job::Daemon;
 use Baseliner::Plug;
 use Baseliner::Utils;
 
+with 'Baseliner::Role::Service';
+
 has 'proc_list' => ( is=>'rw', isa=>'ArrayRef', default=>sub { [] } );
 
-register 'service.job.daemon' => { name => 'Watch for new jobs', config => 'config.job.daemon', handler => \&job_daemon, };
+register 'service.job.daemon' => {
+    name    => 'Watch for new jobs',
+    config  => 'config.job.daemon',
+    handler => \&job_daemon,
+};
+
 register 'service.job.dummy' => {
 	name => 'A Dummy Job',
 	handler => sub {
@@ -34,7 +41,7 @@ sub job_daemon {
                 $r->status('RUNNING');
                 $r->update;
                 #warn "$0 :: @ARGV";
-                my $cmd = "perl $0 job.run runner=\"". $r->runner ."\" step=PRE jobid=". $r->id;
+                my $cmd = "perl $0 job.run --runner \"". $r->runner ."\" --step PRE --jobid ". $r->id;
                 my $proc = Proc::Background->new( $cmd );
                 push @{ $self->{proc_list} }, $proc;
                 $r->pid( $proc->pid );
@@ -57,7 +64,7 @@ sub job_daemon {
                 _log "Starting job ". $r->name;
                 $r->status('RUNNING');
                 $r->update;
-                my $cmd = "perl $0 job.run runner=\"". $r->runner ."\" step=RUN jobid=". $r->id;
+                my $cmd = "perl $0 job.run --runner \"". $r->runner ."\" --step RUN --jobid ". $r->id;
                 my $proc = Proc::Background->new( $cmd );
                 push @{ $self->{proc_list} }, $proc;
                 $r->pid( $proc->pid );
@@ -75,7 +82,7 @@ sub job_daemon {
                 _log "Starting job ". $r->name;
                 $r->status('RUNNING');
                 $r->update;
-                my $cmd = "perl $0 job.run runner=\"". $r->runner ."\" step=POST jobid=". $r->id;
+                my $cmd = "perl $0 job.run --runner \"". $r->runner ."\" --step POST --jobid ". $r->id;
                 my $proc = Proc::Background->new( $cmd );
                 push @{ $self->{proc_list} }, $proc;
                 $r->pid( $proc->pid );

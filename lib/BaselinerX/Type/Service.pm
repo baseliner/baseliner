@@ -2,6 +2,7 @@ package BaselinerX::Type::Service;
 use Baseliner::Plug;
 use Baseliner::Utils;
 with 'Baseliner::Core::Registrable';
+use BaselinerX::Type::Service::Logger;
 
 register_class 'service' => __PACKAGE__;
 
@@ -88,24 +89,25 @@ sub run {
 	my $module = $self->module;
     $self->log( BaselinerX::Type::Service::Logger->new() );  #TODO allow different classes to log
 
-	_log "\n===Starting service: $key | $version | $service | $module ===\n";
+	print "\n===Starting service: $key | $version | $service | $module ===\n";
+
+	my $instance = $module->new( log=>BaselinerX::Type::Service::Logger->new );
+	#my $instance = bless($self, $module);
 
 	if( ref($handler) eq 'CODE' ) {
-		my $r = $handler->( bless($self, $module), $c, @_ );
-        my $msg = $self->log->msg . ( ref $r ? "\n".$r->{msg} : '' );
-        _log $msg;
+		$handler->( $instance, $c, @_ );
+        _log $self->log->msg;
         return {
-            rc => ref $r && defined $r->{rc} ? $r->{rc} : $self->log->rc(),
-            msg=> $msg
+            rc => $self->log->rc,
+            msg=> $self->log->msg, 
         };
 	} 
 	elsif( $handler && $module ) {
-		my $r = $module->$handler(bless($self,$module), $c, @_);	
-        my $msg = $self->log->msg . ( ref $r ? "\n".$r->{msg} : '' );
-        _log $msg;
+		$module->$handler( $instance, $c, @_);	
+        _log $self->log->msg;
         return {
-            rc => ref $r && defined $r->{rc} ? $r->{rc} : $self->log->rc(),
-            msg=> $msg
+            rc => $self->log->rc,
+            msg=> $self->log->msg, 
         };
 	}
 	else {

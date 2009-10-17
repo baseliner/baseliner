@@ -2,20 +2,21 @@ package BaselinerX::Eclipse;
 use strict;
 use Carp;
 use File::Find;
-use Error qw(:try);
+use Try::Tiny;
+use Baseliner::Utils;
 
 sub new {
     my $class = shift();
     my %opts  = @_;
     my ( $dir, $locale ) = ( $opts{workspace}, $opts{locale} );
-    $dir =~ s/\s//g;
+    #$dir =~ s/\s//g;
     $dir .= "/";
     $dir = slashFwd($dir);
     $dir =~ s{//}{/}g;
-    confess _loc( "$class: the workspace directory '%1' does not exist", $dir )
+    die "$class: the workspace directory '$dir' does not exist"
       if ( !-e $dir );
     my %W = discoverWorkspace($dir);
-    confess _loc( "$class: the workspace directory '%1' is empty:", $dir ) .
+    die _loc( "$class: the workspace directory '%1' is empty:", $dir ) .
       keys %W
       if ( !keys %W );
 
@@ -71,12 +72,10 @@ sub discoverWorkspace {
                 try {
                     print "Parseando $W{$prj}{$class}{path}...\n";
                     my $XML = XML::Smart->new( $W{$prj}{"$class"}{data} )
-                      or confess _loc(
-                        "discoverWorkspace: could not parse file %1: %2",
-                        $W{$prj}{$class}{path}, $! );
+                      or die _loc( "discoverWorkspace: could not parse file %1: %2", $W{$prj}{$class}{path}, $! );
                     $W{$prj}{"$class"}{xml} = \$XML if ($XML);
                 }
-                otherwise {    ##xml either not valid or not xml at all : ignore
+                catch {    ##xml either not valid or not xml at all : ignore
                 };
             }
         },
@@ -110,16 +109,6 @@ sub opt {
     my $self = shift();
     return '' if !@_;    ## false if opt is not an arg
     return $self->{opts}{ shift() };
-}
-
-sub _unique {
-    keys %{ { map { $_ => 1 } @_ } };
-}
-sub _loc { print( @_, "\n" ); }
-
-sub slashFwd {
-    $_[0] =~ s{\\}{/}g;
-    return $_[0];
 }
 
 =head2 projects()

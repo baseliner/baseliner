@@ -3,10 +3,12 @@ package Baseliner::Core::Registry;
 use Moose;
 use MooseX::ClassAttribute;
 use Moose::Exporter;
-Moose::Exporter->setup_import_methods();
+use Try::Tiny;
 use Carp;
 use YAML;
 use Baseliner::Utils;
+
+Moose::Exporter->setup_import_methods();
 
 class_has 'registrar' =>
 	( is      => 'rw',
@@ -19,6 +21,9 @@ class_has 'classes' =>
 	  isa     => 'HashRef',
 	  default => sub { {} },
 	);
+
+class_has 'keys_enabled' => ( is=>'rw', isa=>'HashRef', default=>sub{{}} );
+class_has '_registrar_enabled' => ( is=>'rw', isa=>'HashRef', );
 
 {
 	package Baseliner::Core::RegistryNode;
@@ -35,10 +40,25 @@ class_has 'classes' =>
 	
 }	
 
+sub _registrar {
+    my $self = shift;
+    #return $self->_registrar_enabled if ref $self->_registrar_enabled;
+    #$self->_registrar_enabled({});
+    my @disabled_keys = 
+        grep { ! $self->is_enabled($_) }
+        keys %{ $self->_registrar };
+    for my $key ( @disabled_keys ) {
+       delete $self->_registrar->{$key} 
+        if defined $self->_registrar->{$key};
+    }
+    return $self->_registrar;
+    #return $self->_registrar;
+}
+
 # the 'register' command
 sub add {
 	my ($self, $pkg, $key, $param)=@_;
-	my $reg = $self->registrar();
+	my $reg = $self->registrar;
     if( ref $param eq 'HASH' ) {
         $param->{key}=$key unless($param->{key});
         $param->{short_name} = $key; 
@@ -62,19 +82,29 @@ sub add_class {
 	$reg->{$key} = $class;
 }
 
+# everything starts here, called from Baseliner.pm
+sub setup {
+	my $self= shift; 
+    $self->load_enabled_list;
+    $self->initialize( @_ );
+}
+
 ## blesses all registered objects into their registrable classes (new Service, new Config, etc.)
 sub initialize {
 	my $self= shift; 
-	my @namespaces = ( @_ ? @_ : keys %{ $self->registrar || {} } );
+
 	my %init_rc = ();
+	my @namespaces = ( @_ ? @_ : keys %{ $self->registrar || {} } );
+
 	## order by init_rc
 	for my $key ( @namespaces ) {
 		my $node = $self->registrar->{$key};
 		next if( ref $node->instance );  ## already initialized
 		push @{ $init_rc{ $node->init_rc } } , [ $key, $node ];
 	}
+
 	## now, startup ordered based on init_rc
-	##TODO solve dependencies with a graph
+        ##TODO solve dependencies with a graph
 	for my $rc ( sort keys %init_rc ) {
 		for my $rc_node ( sort @{ $init_rc{$rc} } ) {
 			my ($key, $node) = @{  $rc_node };
@@ -115,7 +145,7 @@ Return the key registration object (node)
 =cut
 sub get_node {
 	my ($self,$key)=@_;
-	$key || confess "Missing parameter \$key";
+	$key || croak "Missing parameter \$key";
 	return ( $self->registrar->{$key} 
 		or $self->search_for_node( id=>$key ) 
         or $self->get_partial($key) );
@@ -147,20 +177,28 @@ sub dump_yaml {
 	Dump( shift->registrar );
 }
 
+sub load_enabled_list {
+    my ( $self ) = @_;
+    my $rs = Baseliner->model('Baseliner::BaliConfig')->search({ ns=>'/', bl=>'*', key=>{ -like => '%.enabled' } });
+    while( my $row = $rs->next ) {
+        my $key = $row->key;
+        my $enabled = $row->value;
+        $self->keys_enabled->{ $key } = $enabled;
+    }
+}
+
 ## check the db if its key=>enabled|disabled
 sub is_enabled {
-    my ($key) = @_;
-    $key .= '.enabled';
+    my ($self, $key) = @_;
     my $state = 1;
-    eval {
-		my $r = Baseliner->model('Baseliner::BaliConfig')->search({ ns=>'/', bl=>'*', key=>$key })->first;
-        if( defined $r ) {
-            $state = $r->value;
+    try {
+        if( defined $self->keys_enabled->{ $key } ) {
+            $state = $self->keys_enabled->{ $key };
         }
+    } catch {
+        my $e = shift;
+        _log "is_enabled: error while checking '$key': $e";
     };
-    if( $@ ) {
-        _log "is_enabled: error while checking '$key': $@";
-    }
     return $state;
 }
 
@@ -215,7 +253,7 @@ sub search_for_node {
                 }
             }
 		}
-		push(@found,$self->registrar->{$key}) if !$check_enabled || is_enabled( $key );
+		push(@found,$self->registrar->{$key});
 	}
 	return wantarray ? @found : $found[0];
 }
@@ -229,8 +267,8 @@ sub search_for {
 sub starts_with {
 	my ($self, $key_prefix )=@_;
 	my @keys;
-	for( keys %{ $self->registrar || {} } ) {
-		push @keys, $_ if( /^$key_prefix/ );
+	for my $key ( keys %{ $self->registrar || {} } ) {
+		push @keys, $key if( $key =~ /^$key_prefix/ );
 	}
 	return @keys;
 }

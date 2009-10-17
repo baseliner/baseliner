@@ -4,15 +4,20 @@ use Baseliner::Utils;
 use Try::Tiny;
 
 #has 'actions' => ( is=>'rw', isa=>'HashRef', default=>sub{{}} );
-has 'user' => ( is=>'rw', isa=>'Any', );
 has 'username' => ( is=>'rw', isa=>'Str',  );
+has 'languages' => ( is=>'rw', isa=>'ArrayRef',  );
 
-sub BUILD {
-	my $self = shift;
-	if( ref $self->user && !$self->username ) {
-		try { $self->username( $self->user->username ) };
-		try { $self->username( $self->user->id ) };
+sub BUILDARGS {
+	my $class = shift;
+    my %args = @_;
+    my $out = {};
+
+	if( ref $args{user} ) {
+        my $user = $args{user};
+		try { $out->{username} = $user->username };
+		try { $out->{username} = $user->id };
 	}
+    return $class->SUPER::BUILDARGS($out);
 }
 
 sub email {

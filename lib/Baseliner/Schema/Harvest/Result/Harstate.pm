@@ -115,4 +115,9 @@ __PACKAGE__->has_many(
 
 
 # You can replace this text with custom content, and it will be preserved on regeneration
+__PACKAGE__->belongs_to(
+  "view",
+  "Baseliner::Schema::Harvest::Result::Harview",
+  { viewobjid => "viewobjid" },
+);
 1;

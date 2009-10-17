@@ -1,0 +1,35 @@
+<%doc>
+    Draws fieldsets for all config structures,
+    but limiting it to the key list in $c->stash->{metadata_filter}.
+</%doc>
+[
+<%perl>
+	use JavaScript::Dumper;
+	my $cnt = 0;
+	
+    for my $config ( $c->model('ConfigStore')->all ) {
+        my @metadata = $config->metadata_filter( @{ $c->stash->{metadata_filter} || [] } );
+        if( scalar @metadata ) {  
+</%perl>
+                {
+                      xtype : "fieldset",
+                      autoHeight : true,
+                      itemId : '<% $config->key %>',
+                      autoWidth : true,
+                      title : "<% _loc( $config->desc || $config->key ) %>",
+                      collapsible: true,
+                      items : [
+%            for my $row ( @metadata ) {
+%                $c->stash->{metadata_row} = $row;
+                          <& /comp/config/config_selector.mas, config=>$config &>
+%            }
+                      ]
+                },
+<%perl>
+        }
+    }
+</%perl>
+]
+<%filter>
+    s/,[\s|\t|\n]*\]/\]/g;
+</%filter>

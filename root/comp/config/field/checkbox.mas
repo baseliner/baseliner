@@ -1,0 +1,6 @@
+<%args>
+    $row 
+</%args>
+    xtype: "checkbox",
+    boxLabel: "<% $row->{text} %>",
+    inputValue: "<% $row->{value} %>",

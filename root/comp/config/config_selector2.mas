@@ -1,0 +1,287 @@
+<%args>
+    $config => ''
+</%args>
+<%perl>
+	use Switch 'Perl6';
+    my $row = $c->stash->{metadata_row};
+    my $key = $c->stash->{config_key};
+</%perl>
+
+% if( $c->stash->{single_comp} ) {
+[
+% }
+
+% given( uc( $row->{type} ) ) {
+			
+{
+% when /TEXT|HASH/ {
+					xtype: 'textfield',
+% if($row->{vtype}) {					
+					vtype: "<% $row->{vtype} %>",
+% }					  
+% }
+
+
+% when /TEXTAREA/ {
+					xtype: 'textarea',
+					attrs_xml: {  wysiwyg: 1 },
+% }
+
+% when /BOOL/ {
+					xtype: 'Select',
+					options: [ ['1','True'], ['0','False'] ],
+					default: '1',
+% }
+
+% when /HIDDEN/ {
+					xtype: 'hidden',
+% }
+
+% when /COMBO/ {
+                    xtype: "combo",
+                    typeAhead: "true",
+                    triggerAction: "all",
+                    lazyRender: "true",
+                    listClass: "x-combo-list-small",
+                    store: <% _utf8 js_dumper $row->{store} %>,       										
+% }
+
+% when /CHECKBOX/ {
+                    xtype: "checkbox",
+                    boxLabel: "<% $row->{text} %>",
+                    inputValue: "<% $row->{value} %>",
+% }	
+				
+% when /LISTBOX/ {
+					xtype:"editorgrid",
+			    	id: '<% $row->{id} %>',
+			    	name: '<% $row->{id} %>',
+			        store: new Ext.data.JsonStore({
+						url: '<% $row->{json_url} %>',
+						root:'data',
+						fields: [ 
+							{  name: '<% $row->{id} %>' }
+						]
+					}),
+			        cm: new Ext.grid.ColumnModel([{
+			           id:'cm<% $row->{id} %>',
+			           header: "<% $row->{id} %>",
+			           dataIndex: '<% $row->{id} %>',
+			           width: <% $row->{width} - 20 %>,
+			           editor: new Ext.form.TextField({
+			               allowBlank: false
+			           })
+			        }]),
+			        sm: (function(){
+			        	var rsm = new Ext.grid.RowSelectionModel({singleSelect:true}); 
+                       	rsm.addListener('rowselect', 
+ 							function (){
+                                 var __record = rsm.getSelected();
+                                 return __record;
+                            });
+                         return rsm;
+                    })(),
+			        width:<% $row->{width} %>,
+			        height:<% $row->{height} %>,
+			        title:'<% $row->{title} %>',
+			        frame:true,
+			        clicksToEdit:1,			
+			        tbar: [{
+			            text: '<% $row->{newLabel} %>',
+			            icon: '/static/images/drop-add.gif',
+			           	cls: 'x-btn-text-icon',
+			            handler : function(){
+						    var ___record = Ext.data.Record.create([
+						           {name: '<% $row->{id} %>', type: 'string'}
+						      ]);
+						      			            
+			                var p = new ___record({
+			                    '<% $row->{id} %>': '<% $row->{newLabel} %>'
+			                });
+			                
+			                var __grid = Ext.getCmp('<% $row->{id} %>');
+			                __grid.stopEditing();
+			                __grid.getStore().insert(0, p);
+			                __grid.startEditing(0, 0);
+			                
+			                var __parentForm = __grid.findParentByType('form');
+			                
+							__parentForm.addListener('beforeaction',
+							                function(__frm) {
+							             		var __myStore = __grid.getStore();
+							             		var __vals = "";
+							             		for(var i=0;i< __myStore.getCount();i++){
+							             			__vals = __vals + __myStore.getAt(i).data.<% $row->{id} %> + ";";
+							             		}
+							             		if(__vals!="")
+							             			__frm.setValues({<% $row->{id} %>:__vals});
+							                    
+							                }
+							        );			                
+			            }},
+			            {
+			            text: '<% $row->{delLabel} %>',
+			            icon: '/static/images/del.gif',
+			           	cls: 'x-btn-text-icon',
+			            handler : function(e){     
+			                var __grid = Ext.getCmp('<% $row->{id} %>');			            
+			                var __selectedRecord = __grid.getSelectionModel().getSelected();
+			                if(__selectedRecord!=null){
+			                	__grid.getStore().remove(__selectedRecord);
+			                }
+			                
+			                var __parentForm = __grid.findParentByType('form');
+			                
+							__parentForm.addListener('beforeaction',
+							                function(__frm) {
+							             		var __myStore = __grid.getStore();
+							             		var __vals = "";
+							             		for(var i=0;i< __myStore.getCount();i++){
+							             			__vals = __vals + __myStore.getAt(i).data.<% $row->{id} %> + ";";
+							             		}
+							             		if(__vals!="")
+							             			__frm.setValues({<% $row->{id} %>:__vals});
+							                    
+							                }
+							        );				                
+			                
+			            }
+			        }]
+				},{
+					xtype: "hidden",		
+					listeners: {change:{fn:function(e,newVal,oldVal){		
+						    var __record = Ext.data.Record.create([
+						           {name: <% $row->{id} %>, type: 'string'}
+						      ]);
+						      var __mstore = e.findParentByType('form').findById('<% $row->{id} %>').store;
+						      __mstore.removeAll();						      
+						      var valores = newVal.split(';');
+						      for(var x=0;x < valores.length;x++)
+						      	if(valores[x] != '') __mstore.insert(x,new __record({<% $row->{id} %> : valores[x]}));
+							}
+						}
+					},
+									
+% }	#LISTBOX			
+				
+%##Atajo para dibujar los combos de Namespace y Baseline
+
+% when /NAMESPACES/ {
+                    xtype: "combo",
+                    editable: "false",
+                    forceSelection: "true",
+                    mode: "local",
+                    triggerAction: "all",
+                    value: "/",
+                    allowBlank: false,
+                    valueField: "value",
+                    displayField: "text",
+                    hiddenName: 'ns',     
+                    listWidth:300,
+                    width:300,
+                    lazyRender: true,
+                    listClass: "x-combo-list-small",
+                    store: new Ext.data.SimpleStore({
+					    fields: ['value', 'text'],
+					    data :  <% _utf8 js_dumper $c->stash->{namespaces} %>
+
+					}),
+                    listeners: {select:{fn:function(combo, value) {
+                    	var nsUrl = '<% $row->{url} %>?'; //ok
+                    	var pPanelForm = combo.findParentByType('form');
+                    	var parentForm = pPanelForm.getForm();
+                    	var frmItems = parentForm.items.items;
+                    	for(var i=0; i < frmItems.length; i++){  
+                    		if(frmItems[i].name!=undefined && frmItems[i].value!=undefined){
+                    			nsUrl = nsUrl +frmItems[i].name + '=' + frmItems[i].value + '&';
+                    		}
+                    	}
+                    	parentForm.load({url:nsUrl
+% if  ($row->{reloadChildren}) {
+						,success: function(form,action){
+							var pComponents = pPanelForm.findByType(Ext.grid.GridPanel);
+							for(var i=0;i < pComponents.length;i++){	
+								if(pComponents[i].store != null){								
+									pComponents[i].store.load();
+								}					
+							}
+						}
+% }                   	
+                    	});
+                    }}},		
+% } #NAMESPACES							
+				
+% when /BASELINES/ {
+                    xtype: "combo",
+                    editable: "false",
+                    forceSelection: "true",
+                    mode: "local",
+                    triggerAction: "all",
+                    value: "*",
+                    allowBlank: false,
+                    valueField: "value",
+                    displayField: "text",
+                    hiddenName: 'bl', 
+                    lazyRender: "true",
+                    listClass: "x-combo-list-small",
+                    store: new Ext.data.SimpleStore({
+					    fields: ['value', 'text'],
+					    data :  <% _utf8 js_dumper $c->stash->{baselines} %>
+
+					}),                    
+                    listeners: {select:{fn:function(combo, value) {
+                    	var nsUrl = '<% $row->{url} %>?'; //ok
+                    	var pPanelForm = combo.findParentByType('form');
+                    	var parentForm = pPanelForm.getForm();
+                    	var frmItems = parentForm.items.items;
+                    	for(var i=0; i < frmItems.length; i++){  
+                    		if(frmItems[i].name!=undefined && frmItems[i].value!=undefined){
+                    			nsUrl = nsUrl +frmItems[i].name + '=' + frmItems[i].value + '&';
+                    		}
+                    	}
+                    	parentForm.load({url:nsUrl
+% if  ($row->{reloadChildren}) {
+						,success: function(form,action){
+							var pComponents = pPanelForm.findByType(Ext.grid.GridPanel);
+							for(var i=0;i < pComponents.length;i++){	
+								if(pComponents[i].store != null){								
+									pComponents[i].store.load();
+								}					
+							}
+						}
+% }                   	
+                    	});
+                    }}},
+% }	#BASELINES		
+% else {
+                    xtype: "textfield",
+% }				
+% } ## given
+
+% if( ref $config ) {
+		name: "<% $config->key .'.'. $row->{id} %>",
+% } elsif( $c->stash->{config_key} ) {
+		name: "<% $c->stash->{config_key} %>",
+% } else {
+		name: "<% $row->{name} || $row->{id} %>",
+% }
+		fieldLabel: "<% _loc($row->{label}) || $row->{name} || $row->{id} %>",
+
+%# incluimos validacion, posibles valores de vtype: 'alpha', 'alphanum' y todos los Vtypes.js de EXT
+%# cuando la propiedad nullable sea igual a 0 el campo será obligario, por defecto no lo es
+% if($row->{vtype}) {
+		vtype: "<% $row->{vtype} %>",
+% }			
+% for my $e_name ( keys %{ $row->{extjs} || {} } ) {  			
+		<% $e_name %>:  "<% $row->{extjs}->{$e_name} %>",
+% }
+
+		allowBlank: <% (!defined $row->{nullable} || $row->{nullable} eq "")? 1 : $row->{nullable} %>
+}
+% if( ! $c->stash->{single_comp} ) {
+, 		
+% }
+
+% if( $c->stash->{single_comp} ) {
+]
+% }

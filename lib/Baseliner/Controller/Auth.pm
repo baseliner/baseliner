@@ -7,15 +7,23 @@ use YAML;
 use MIME::Base64;
 use Baseliner::Core::User;
 
-sub go : Local {
+sub login_from_url : Local {
     my ( $self, $c ) = @_;
     my $p = $c->req->params;
     if( $p->{USER_NAME} ) {  #TODO check for referer 'harvest'
-        my $username = decode_base64($p->{USER_NAME});
-        $c->authenticate({ id=>$username }, 'ldap_no_pw');
-		$c->session->{user} = new Baseliner::Core::User( user=>$c->user, username=>$username );
+		my $username = decode_base64($p->{USER_NAME});
+		try {
+			$c->authenticate({ id=>$username }, 'ldap_no_pw');
+			$c->session->{user} = new Baseliner::Core::User( user=>$c->user, username=>$username );
+		} catch {
+			# failed to find ldap, just let him in
+			$c->session->{user} = new Baseliner::Core::User( username=>$username );
+			$c->forward( '/auth/login_local' );
+		};
     }
-    $c->forward('/index');
+    if( ref $c->user ) {
+        $c->forward('/index');
+    }
 }
 
 sub login_local : Local {

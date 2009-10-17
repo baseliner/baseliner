@@ -27,53 +27,25 @@
 		]
 	});
 
-	// Esta es la definición del objeto buscador
-	Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
-		initComponent : function(){
-			Ext.app.SearchField.superclass.initComponent.call(this);
-			this.on('specialkey', function(f, e){
-				if(e.getKey() == e.ENTER){
-					this.onTrigger2Click();
-				}
-			}, this);
-		},
+    <& /comp/search_field.mas &>
 
-		validationEvent:false,
-		validateOnBlur:false,
-		trigger1Class:'x-form-clear-trigger',
-		trigger2Class:'x-form-search-trigger',
-		hideTrigger1:true,
-		width:280,
-		hasSearch : false,
-		paramName : 'query',
-
-		onTrigger1Click : function(){
-			if(this.hasSearch){
-				this.el.dom.value = '';
-				var o = {start: 0};
-				this.store.baseParams = this.store.baseParams || {};
-				this.store.baseParams[this.paramName] = '';
-				this.store.reload({params:o});
-				this.triggers[0].hide();
-				this.hasSearch = false;
-			}
-		},
-
-		onTrigger2Click : function(){
-			var v = this.getRawValue();
-			if(v.length < 1){ //>
-				this.onTrigger1Click();
-				return;
-			}
-			var o = {start: 0};
-			this.store.baseParams = this.store.baseParams || {};
-			this.store.baseParams[this.paramName] = v;
-			this.store.reload({params:o});
-			this.hasSearch = true;
-			this.triggers[0].show();
-		}
-	});
-
+    Baseliner.jobRenderer = function(value,metadata,rec,rowIndex,colIndex,store) {
+		return '<b>' + value + '</b>';
+	};
+    Baseliner.levRenderer = function(value,metadata,rec,rowIndex,colIndex,store) {
+        var icon;
+		var status = rec.data.status_code;
+        if( status=='RUNNING' ) icon='log_d.gif';
+        else if( status=='FINISHED' ) icon='log_i.gif';
+        else if( status=='IN-EDIT' ) icon='log_w.gif';
+        else icon='log_e.gif';
+        if( icon!=undefined ) {
+            return "<img alt='"+status+"' border=0 src='/static/images/"+icon+"' />" + value ;
+        } else {
+            return value;
+        }
+    };
+	
 	// Después de que cargue la página:
 		var ps = 50; //page_size
 		store.load({params:{start:0 , limit: ps}}); 
@@ -85,6 +57,7 @@
             stripeRows: true,
 			autoScroll: true,
 			autoWidth: true,
+			wait: 'loading...',
 			store: store,
 			viewConfig: [{
 					forceFit: true
@@ -92,14 +65,14 @@
 			selModel: new Ext.grid.RowSelectionModel({singleSelect:true}),
 			loadMask:'true',
 			columns: [
-				{ header: '<% _loc('Job') %>', width: 100, dataIndex: 'name', sortable: true, css: ' background-color: yellow ' },	
-				{ header: '<% _loc('Job Status') %>', width: 100, dataIndex: 'status', sortable: true },
+				{ header: '<% _loc('Job') %>', width: 100, dataIndex: 'name', sortable: true, renderer: Baseliner.jobRenderer, css: ' background-color: yellow ' },	
+				{ header: '<% _loc('Job Status') %>', width: 100, dataIndex: 'status', renderer: Baseliner.levRenderer, sortable: true },
 				{ header: '<% _loc('Baseline') %>', width: 50, dataIndex: 'bl', sortable: true },	
 				{ header: '<% _loc('Job Type') %>', width: 100, dataIndex: 'type', sortable: true }	,
 				{ header: '<% _loc('User') %>', width: 80, dataIndex: 'username', sortable: true },	
 				{ header: '<% _loc('Step') %>', width: 80, dataIndex: 'step', sortable: true },	
 				{ header: '<% _loc('Start Date') %>', width: 150, dataIndex: 'starttime', sortable: true },	
-				{ header: '<% _loc('Max Start Date') %>', width: 150, dataIndex: 'maxstarttime', sortable: true },	
+				{ header: '<% _loc('Max Start Date') %>', width: 150, dataIndex: 'maxstarttime', sortable: true, hidden: true },	
 				{ header: '<% _loc('End Date') %>', width: 150, dataIndex: 'endtime', sortable: true },	
 				{ header: '<% _loc('PID') %>', width: 50, dataIndex: 'pid', sortable: true, hidden: true },	
 				{ header: '<% _loc('Host') %>', width: 120, dataIndex: 'host', sortable: true, hidden: true },	
@@ -151,9 +124,11 @@
 					handler: function() {
 						var sm = grid.getSelectionModel();
 						var sel = sm.getSelected();
-                        if( sel.data.status == 'RUNNING' ) {
+                        if( sel.data.status_code == 'RUNNING' ) {
                             msg = '<% _loc('Killing the job will interrupt current local processing but no remote processes') %>';
                             msg += "\n" + '<% _loc('Are you sure you want to kill the job') %> ';
+                        } else if( sel.data.status_code == 'CANCELLED' ) {
+                            msg = '<% _loc('Are you sure you want to delete the job') %> ';
                         } else {
                             msg = '<% _loc('Are you sure you want to cancel the job') %> ';
                         }
@@ -164,7 +139,7 @@
 									conn.request({
 										url: '/job/submit',
 										params: { action: 'delete', id_job: sel.data.id },
-										success: function(resp,opt) { grid.getStore().remove(sel); },
+										success: function(resp,opt) { grid.getStore().reload(); },
 										failure: function(resp,opt) { Ext.Msg.alert('<% _loc('Error') %>', '<% _loc('Could not delete the job.') %>'); }
 									});	
 								}
@@ -206,16 +181,7 @@
 	   grid.getView().forceFit = true;
 
        grid.getView().getRowClass = function(rec, index){
-            var css = '';
-            if( rec.data.status_code == 'ERROR' )  
-                css = index % 2 > 0 ? 'level-row error-odd' : 'level-row error-even' ;
-            else if( rec.data.status_code == 'RUNNING' )  
-                css = index % 2 > 0 ? 'level-row debug-odd' : 'level-row debug-even' ;
-            else if( rec.data.status_code == 'KILLED' )  
-                css = index % 2 > 0 ? 'level-row warn-odd' : 'level-row warn-even' ;
-            else
-                css = index % 2 > 0 ? 'level-row info-odd' : 'level-row info-even' ;
-
+			var css = index % 2 > 0 ? 'level-row info-odd' : 'level-row info-even' ;
             return css;
         }; 
 

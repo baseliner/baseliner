@@ -68,6 +68,15 @@ sub cut_to_subset {
     return __PACKAGE__->new( elements=>[ $self->subset( $part, $value ) ] );
 }
 
+=head2 count
+    
+Returns the number of elements.
+
+=cut
+sub count {
+    my $self = shift;
+    return scalar @{ $self->elements };
+}
 
 =head2 subset (part, value)
 

@@ -126,6 +126,9 @@ msgstr "Aprobación"
 msgid "Pending Approval"
 msgstr "Pendiente de Aprobación"
 
+msgid "Requesting approval for baseline %1, item %2"
+msgstr "Solicitando aprobación para el pase en el entorno %1, item %2"
+
 msgid "Root Namespace"
 msgstr "Ámbito Global"
 
@@ -161,6 +164,12 @@ msgstr "Fecha de Inicio"
 
 msgid "End Date"
 msgstr "Fecha de Finalización"
+
+msgid "Start Time"
+msgstr "Hora Inicio"
+
+msgid "End Time"
+msgstr "Hora Fin"
 
 msgid "Max Start Date"
 msgstr "Fecha Máxima de Inicio"
@@ -306,6 +315,9 @@ msgstr "Preferencias de Visualización"
 msgid "Create a new Job"
 msgstr "Crear Nuevo Pase"
 
+msgid "Could not rerun the job"
+msgstr "Error al intentar reiniciar el pase"
+
 msgid "Job Manager"
 msgstr "Gestor de Pases" 
 
@@ -366,6 +378,9 @@ msgstr "Opciones del Pase"
 msgid "Baseline"
 msgstr "Entorno"
 
+msgid "Baselines"
+msgstr "Entornos"
+
 msgid "Service"
 msgstr "Servicio"
 
@@ -389,6 +404,9 @@ msgstr "Seleccione los Elementos del Pase"
 
 msgid "Members"
 msgstr "Miembros"
+
+msgid "View"
+msgstr "Ver"
 
 msgid "Edit"
 msgstr "Editar"

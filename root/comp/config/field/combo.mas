@@ -1,0 +1,9 @@
+<%args>
+    $row 
+</%args>
+    xtype: "combo",
+    typeAhead: "true",
+    triggerAction: "all",
+    lazyRender: "true",
+    listClass: "x-combo-list-small",
+    store: <% js_dumper( $row->{store} ) %>,       										

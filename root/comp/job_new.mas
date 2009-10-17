@@ -251,6 +251,7 @@ Ext.onReady(function(){
 					},
 					name: 'job_date' 
 				  },
+                  <%doc>
                   {
 					   xtype: 'combo', 
 					   name: 'job_time', 
@@ -268,16 +269,15 @@ Ext.onReady(function(){
 					   allowBlank: false,
 					   width: 500 
                   }, 
-                  <%doc>
+                  </%doc>
 				  { 
 					xtype: 'textfield', 
 					fieldLabel: '<% _loc('Time') %>', 
 				    allowBlank: false,
 					value: '<% $hm %>',
 					vtype: 'hour',
-					name: 'job_time2' 
+					name: 'job_time' 
 				  },
-                  </%doc>
 				  jc_grid
 			  ] 
 		  }); 

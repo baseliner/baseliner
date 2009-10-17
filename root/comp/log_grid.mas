@@ -23,6 +23,7 @@
 			{  name: 'text' },
 			{  name: 'ts' },
 			{  name: 'lev' },
+			{  name: 'module' },
 			{  name: 'ns' },
 			{  name: 'provider' },
 			{  name: 'file' },
@@ -157,6 +158,8 @@
 				{ header: '<% _loc('Message') %>', width: 450, dataIndex: 'text', sortable: true },
 				{ header: '<% _loc('Namespace') %>', width: 100, dataIndex: 'ns', sortable: true, hidden: true },	
 				{ header: '<% _loc('Provider') %>', width: 100, dataIndex: 'provider', sortable: true, hidden: true },
+				{ header: '<% _loc('Module') %>', width: 200, dataIndex: 'module', sortable: true, hidden: true },
+				{ header: '<% _loc('Log Id') %>', width: 80, dataIndex: 'id', sortable: true, hidden: true },
 				{ header: '<% _loc('Actions') %>', width: 100, dataIndex: 'more', renderer: Baseliner.actionsRenderer, sortable: true }	
             ],
 			autoSizeColumns: true,

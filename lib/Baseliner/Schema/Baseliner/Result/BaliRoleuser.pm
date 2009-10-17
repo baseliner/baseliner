@@ -49,4 +49,20 @@ __PACKAGE__->belongs_to(
   { id => "id_role" },
 );
 
+__PACKAGE__->has_many(
+  "actions",
+  "Baseliner::Schema::Baseliner::Result::BaliRoleaction",
+  { 'foreign.id_role' => "self.id_role" },
+);
+
+__PACKAGE__->has_many(
+  "requests",
+  "Baseliner::Schema::Baseliner::Result::BaliRequest",
+  [
+      { 'foreign.ns' => "self.ns" },
+      { 'foreign.bl' => "actions.bl" },
+      { 'foreign.action' => "actions.action" },
+  ]
+);
+
 1;

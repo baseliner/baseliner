@@ -41,6 +41,7 @@ BEGIN {
             +CatalystX::Features::Plugin::ConfigLoader
             +Baseliner::Plugin::CommandLine
             Authentication
+			Unicode 
             Email
             Cache
             Session		Session::Store::File	Session::State::Cookie
@@ -102,32 +103,33 @@ __PACKAGE__->config(
 );
 
 ## Authentication
- __PACKAGE__->config(
-      'authentication' => {
-         realms => {
-           ldap => {
-             store => {
-               class               => "LDAP",
-               user_class          => "Baseliner::Core::User::LDAP",
-               entry_class         => "Baseliner::LDAP::Entry",
-               user_results_filter => sub { return shift->pop_entry },
-             },
-           },
-         },
-       },
+    __PACKAGE__->config(
+        'authentication' => {
+            realms => {
+                ldap => {
+                    store => {
+                        class               => "LDAP",
+                        user_class          => "Baseliner::Core::User::LDAP",
+                        entry_class         => "Baseliner::LDAP::Entry",
+                        user_results_filter => sub { return shift->pop_entry },
+                    },
+                },
+            },
+        },
     );
- __PACKAGE__->config(
-      'authentication' => {
-         realms => {
-           ldap_no_pw =>  \%{ __PACKAGE__->config->{authentication}->{realms}->{ldap} },
-         },
-       },
+    __PACKAGE__->config(
+        'authentication' => {
+            realms => {
+                ldap_no_pw =>
+                  \%{ __PACKAGE__->config->{authentication}->{realms}->{ldap} },
+            },
+        },
     );
 
 # Start the application
 __PACKAGE__->setup();
 
-Class::C3::initialize();
+#Class::C3::initialize();
 
 # Setup date formating for Oracle
 my $dbh = __PACKAGE__->model('Baseliner')->storage->dbh;
@@ -155,10 +157,11 @@ if( $dbh->{Driver}->{Name} eq 'Oracle' ) {
     Baseliner::Schema::Baseliner::Result::BaliRole->sequence('bali_role_seq');
     Baseliner::Schema::Baseliner::Result::BaliWiki->sequence('bali_wiki_seq');
 }
+
 	
 	# Inversion of Control
-	use Baseliner::Core::Registry;
-	Baseliner::Core::Registry->initialize;
+	require Baseliner::Core::Registry;
+	Baseliner::Core::Registry->setup;
 	Baseliner::Core::Registry->print_table;
     
     # Beep

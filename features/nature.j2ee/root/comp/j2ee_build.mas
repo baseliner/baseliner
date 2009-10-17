@@ -3,7 +3,7 @@
                  frame    : true,
                  url      : '<% $c->stash->{url_submit} %>',
                  width    : <% $c->stash->{width} || 350 %>,
-                 items	  : <& /comp/config_form.mas &>
+                 items	  : <& /comp/config/config_form.mas &>
              }
         );
       form.getForm().load({

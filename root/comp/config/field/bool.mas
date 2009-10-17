@@ -1,0 +1,6 @@
+<%args>
+    $row 
+</%args>
+    xtype: 'Select',
+    options: [ ['1','True'], ['0','False'] ],
+    default: '1',

@@ -28,11 +28,13 @@ sub job_items_json : Path('/job/items/json') {
     my ( $self, $c ) = @_;
 	my $p = $c->req->params;
     # get namespaces that can_job
-		#@ns_list = Baseliner::Core::Namespace->namespaces({ can_job=>1, bl=>$p->{bl}, job_type=>$p->{job_type}, query=>$p->{query} });
- warn ".............................JT=" . $p->{job_type};
+	#@ns_list = Baseliner::Core::Namespace->namespaces({ can_job=>1, bl=>$p->{bl}, job_type=>$p->{job_type}, query=>$p->{query} });
+	#warn ".............................JT=" . $p->{job_type};
+	# load jobable namespaces
     $c->stash->{ns_query} = { can_job=>1, bl=>$p->{bl}, job_type=>$p->{job_type}, query=>$p->{query} };
     $c->forward('/namespace/load_namespaces');
     my @ns_list = @{ $c->stash->{ns_list} || [] };
+
     # create json struct
 	my @job_items;
 	my $cnt=1;
@@ -64,6 +66,8 @@ sub monitor_json : Path('/job/monitor_json') {
     my ( $self, $c ) = @_;
 	my $p = $c->request->parameters;
     my ($start, $limit, $query, $dir, $sort, $cnt ) = @{$p}{qw/start limit query dir sort/};
+    $start||=0;
+    $limit||=50;
 	my $rs = $c->model('Baseliner::BaliJob')->search(undef, { order_by => $sort ? "$sort $dir" : "id desc" });
 	my @rows;
 	while( my $r = $rs->next ) {
@@ -93,7 +97,7 @@ sub monitor_json : Path('/job/monitor_json') {
           if ( ( $cnt++ >= $start ) && ( $limit ? scalar @rows < $limit : 1 ) );
 	}
 	$c->stash->{json} = { 
-        totalCount=> scalar @rows,
+        totalCount=> $cnt,
         data => \@rows
      };	
 	$c->forward('View::JSON');
@@ -114,7 +118,7 @@ sub job_check_time : Path('/job/check_time') {
     my ( $self, $c ) = @_;
 	my $p = $c->request->parameters;
 	my $day = $p->{job_date};
-    my $contents = decode_json $p->{job_contents};
+    my $contents = _decode_json $p->{job_contents};
     my @ns;
     for my $item ( @{ $contents || [] } ) {
         my $provider = $item->{provider};
@@ -136,18 +140,11 @@ sub job_check_time : Path('/job/check_time') {
 sub job_submit : Path('/job/submit') {
     my ( $self, $c ) = @_;
 	my $p = $c->request->parameters;
-	my $config = $c->registry->get('config.job')->data;
-	my $runner = $config->{runner};
 	my $job_name;
     my $username = $c->user ? $c->user->username || $c->user->id : '';
 	eval {
 		if( $p->{action} eq 'delete' ) {
-			my $job = $c->model('Baseliner::BaliJob')->search({ id=> $p->{id_job} })->first;
-			die _loc('Job %1 is currently running and cannot be deleted')
-				unless( $job->is_not_running );
-			#$job->delete;
-			$job->status( 'CANCELLED' );
-            $job->update;
+			$c->model('Jobs')->cancel( id=>$p->{id_job} );
 		}
 		elsif( $p->{action} eq 'rerun' ) {
 			my $job = $c->model('Baseliner::BaliJob')->search({ id=> $p->{id_job} })->first;
@@ -173,7 +170,7 @@ sub job_submit : Path('/job/submit') {
 			my $job_date = $p->{job_date};
 			my $job_time = $p->{job_time};
 			my $job_type = $p->{job_type};
-			my $contents = decode_json $p->{job_contents};
+			my $contents = _decode_json $p->{job_contents};
 			die _loc('No job contents') if( !$contents );
 			# create job
 			my $start = parse_date('dd/mm/Y', "$job_date $job_time");
@@ -181,45 +178,21 @@ sub job_submit : Path('/job/submit') {
 			my $end = $start->clone->add( hours => 1 );
 			my $ora_start =  $start->strftime('%Y-%m-%d %T');
 			my $ora_end =  $end->strftime('%Y-%m-%d %T');
-			my $job = $c->model('Baseliner::BaliJob')->create(
-				{
-					name         => 'temp' . $$,
+
+			$c->model('Jobs')->create( 
 					starttime    => $ora_start,
 					endtime      => $ora_end,
 					maxstarttime => $ora_end,
-					status       => 'IN-EDIT',
-                    step         => 'PRE',
 					type         => $job_type,
 					ns           => '/',
 					bl           => $bl,
                     username     => $username,
-					runner       => $runner,
 					comments     => $comments,
-				}
+					items => $contents
 			);
-			$job_name = $c->model('Jobs')->job_name({ mask=>'%s.%s%08d', type=>$job_type, bl=>$bl, id=>$job->id });
-			$job->name( $job_name );
-			$job->update;
-			# create job items
-			my @item_list;
-			for my $item ( @{ $contents || [] } ) {
-				warn Dump $item;
-				my $items = $c->model('Baseliner::BaliJobItems')->create({
-					data => YAML::Dump($item->{data}),
-					item => $item->{item},
-					service => $item->{service}, 
-					provider => $item->{provider}, 
-					id_job => $job->id,
-				});
-				push @item_list, '<li>'.$item->{item}.' ('.$item->{ns_type}.')';
-			}
-			# log job items
-			my $log = new BaselinerX::Job::Log({ jobid=>$job->id });
-			$log->info('Contenido del pase', join'',@item_list );
-
-			# let it run
-			$job->status( 'READY' );
-			$job->update;
+			#$job_name = $c->model('Jobs')->job_name({ mask=>'%s.%s%08d', type=>$job_type, bl=>$bl, id=>$job->id });
+			#$job->name( $job_name );
+			#$job->update;
 		}
 	};
 	if( $@ ) {

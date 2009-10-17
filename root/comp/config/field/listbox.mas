@@ -1,0 +1,113 @@
+<%args>
+    $row 
+</%args>
+        xtype:"editorgrid",
+        id: '<% $row->{id} %>',
+        name: '<% $row->{id} %>',
+        store: new Ext.data.JsonStore({
+            url: '<% $row->{json_url} %>',
+            root:'data',
+            fields: [ 
+                {  name: '<% $row->{id} %>' }
+            ]
+        }),
+        cm: new Ext.grid.ColumnModel([{
+           id:'cm<% $row->{id} %>',
+           header: "<% $row->{id} %>",
+           dataIndex: '<% $row->{id} %>',
+           width: <% $row->{width} - 20 %>,
+           editor: new Ext.form.TextField({
+               allowBlank: false
+           })
+        }]),
+        sm: (function(){
+            var rsm = new Ext.grid.RowSelectionModel({singleSelect:true}); 
+            rsm.addListener('rowselect', 
+                function (){
+                     var __record = rsm.getSelected();
+                     return __record;
+                });
+             return rsm;
+        })(),
+        width:<% $row->{width} %>,
+        height:<% $row->{height} %>,
+        title:'<% $row->{title} %>',
+        frame:true,
+        clicksToEdit:1,			
+        tbar: [{
+            text: '<% $row->{newLabel} %>',
+            icon: '/static/images/drop-add.gif',
+            cls: 'x-btn-text-icon',
+            handler : function(){
+                var ___record = Ext.data.Record.create([
+                       {name: '<% $row->{id} %>', type: 'string'}
+                  ]);
+                                        
+                var p = new ___record({
+                    '<% $row->{id} %>': '<% $row->{newLabel} %>'
+                });
+                
+                var __grid = Ext.getCmp('<% $row->{id} %>');
+                __grid.stopEditing();
+                __grid.getStore().insert(0, p);
+                __grid.startEditing(0, 0);
+                
+                var __parentForm = __grid.findParentByType('form');
+                
+                __parentForm.addListener('beforeaction',
+                                function(__frm) {
+                                    var __myStore = __grid.getStore();
+                                    var __vals = "";
+                                    for(var i=0;i< __myStore.getCount();i++){
+                                        __vals = __vals + __myStore.getAt(i).data.<% $row->{id} %> + ";";
+                                    }
+                                    if(__vals!="")
+                                        __frm.setValues({<% $row->{id} %>:__vals});
+                                    
+                                }
+                        );			                
+            }},
+            {
+            text: '<% $row->{delLabel} %>',
+            icon: '/static/images/del.gif',
+            cls: 'x-btn-text-icon',
+            handler : function(e){     
+                var __grid = Ext.getCmp('<% $row->{id} %>');			            
+                var __selectedRecord = __grid.getSelectionModel().getSelected();
+                if(__selectedRecord!=null){
+                    __grid.getStore().remove(__selectedRecord);
+                }
+                
+                var __parentForm = __grid.findParentByType('form');
+                
+                __parentForm.addListener('beforeaction',
+                                function(__frm) {
+                                    var __myStore = __grid.getStore();
+                                    var __vals = "";
+                                    for(var i=0;i< __myStore.getCount();i++){
+                                        __vals = __vals + __myStore.getAt(i).data.<% $row->{id} %> + ";";
+                                    }
+                                    if(__vals!="")
+                                        __frm.setValues({<% $row->{id} %>:__vals});
+                                    
+                                }
+                        );				                
+                
+            }
+        }]
+    },{
+        xtype: "hidden",		
+        listeners: {change:{fn:function(e,newVal,oldVal){		
+                var __record = Ext.data.Record.create([
+                       {name: <% $row->{id} %>, type: 'string'}
+                  ]);
+                  var __mstore = e.findParentByType('form').findById('<% $row->{id} %>').store;
+                  __mstore.removeAll();						      
+                  var valores = newVal.split(';');
+                  for(var x=0;x < valores.length;x++)
+                    if(valores[x] != '') __mstore.insert(x,new __record({<% $row->{id} %> : valores[x]}));
+                }
+            }
+        },
+                        
+

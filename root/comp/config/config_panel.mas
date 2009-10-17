@@ -1,0 +1,43 @@
+(function(){
+      var form = new Ext.FormPanel( {
+                 frame    : true,
+                 url      : '<% $c->stash->{url_submit} %>',
+                 width    : <% $c->stash->{width} || 350 %>,
+                 autoScroll: true,
+                 items	  : []
+             }
+        );
+% if ( ref $c->stash->{config} ) {
+%   for my $config ( @{ $c->stash->{config} || [] } ) {
+      form.getForm().load({
+             url:  '<% $c->stash->{url_store} %>',
+             params: { key: '<% $config->key %>', ns: '<% $c->stash->{ns} %>', bl: '<% $c->stash->{bl} %>' }
+      });
+%   }
+      var tb = new Ext.Toolbar({
+             items: [ 
+              '->',
+             { xtype:'button', text: '<% _loc('Save') %>', handler: function(){ Baseliner.formSubmit(form.getForm())} },
+             { xtype:'button', text: '<% _loc( 'Reset') %>', handler: function() { form.getForm().reset() }  }
+             ] 
+      });
+% } else {
+      form.getForm().load({
+             url:  '<% $c->stash->{url_store} %>'
+      });
+      var tb = new Ext.Toolbar({
+             id: 'formtb',
+             items: [ 
+             '<% $c->stash->{title} %>',
+              '->',
+             { xtype:'button', text: '<% _loc('Save') %>', handler: function(){ Baseliner.formSubmit(form.getForm())} },
+             { xtype:'button', text: '<% _loc( 'Reset') %>', handler: function() { form.getForm().reset() }  }
+             ] 
+      });
+% }
+      
+      var panel = new Ext.Panel({
+             layout: 'fit' , border: 0 , tbar: tb, items: [ form  ] 
+      });
+      return panel;
+})();

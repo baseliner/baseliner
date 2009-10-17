@@ -143,13 +143,13 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.04005 @ 2009-09-23 17:13:55
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z0YN7JXRRnX2OVURxEwRHQ
+# Created by DBIx::Class::Schema::Loader v0.04006 @ 2009-10-08 11:43:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iDPBwQgmIOLSMygv/MxKdQ
 
 
 sub is_not_running {
     my $self = shift;
-    return $self->status =~ m/READY|INEDIT|FINISHED|ERROR|KILLED/ ;
+    return $self->status !~ m/RUNNING/ ;
 }
 
 __PACKAGE__->might_have(
@@ -160,6 +160,7 @@ __PACKAGE__->might_have(
 
 # this is the best way to avoid having more than one stash per job
 #  and still maintain ref integrity 
+use Try::Tiny;
 sub stash {
     my ( $self, $data ) = @_;
 
@@ -175,8 +176,12 @@ sub stash {
         $self->id_stash( $stash->id );
         $self->update;
     } else {
-        my $stash = $self->job_stash;
-        return ref $stash ? $stash->stash : undef;
+		try {
+			my $stash = $self->job_stash;
+			return ref $stash ? $stash->stash : undef;
+		} catch {
+			return undef;
+		};
     }
 }
 

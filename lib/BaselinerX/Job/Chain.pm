@@ -1,26 +1,30 @@
 package BaselinerX::Job::Chain;
-use Baseliner::Plug;
+use Moose;
 use Baseliner::Utils;
 
-use YAML;
+has 'id' => ( is=>'rw', isa=>'Int', required=>1 );
+has 'chain' => ( is=>'rw', isa=>'HashRef', required=>1 );
+has 'services' => ( is=>'rw', isa=>'ArrayRef', required=>1 );
+has 'current_index' => ( is=>'rw', isa=>'Int', default=>0 );
 
-register 'config.job.chain.runner' => {
-	metadata => [
-		{ id=>'jobid', required=>1 },
-	]
-};
-register 'service.job.chain.runner' => {
-	name => 'Job chain runner',
-	handler => \&chain_runner,
-};
+sub next_service {
+	my $self = shift;
+	return if $self->done;
+	my $index = $self->current_index;
+	$self->current_index( $index + 1 );
+	return $self->services->[ $index ];
+}
 
-sub chain_runner {
-	my ($self, $c, $config )=@_;
-	my $job = $c->stash->{job};
-	my $log = $job->logger;
+sub current_service {
+	my $self = shift;
+	return $self->services->[ $self->current_index ];
+}
 
-	$log->error( 'hello');
-	$log->warn('not yet', data=>'francamente' );
+sub done {
+	my $self = shift;
+	my $index = $self->current_index;
+    my @services = _array $self->services;
+	return $index >= scalar(@services);
 }
 
 1;

@@ -4,9 +4,9 @@ use strict;
 use base 'Catalyst::Model::DBIC::Schema';
 
 __PACKAGE__->config(
-    schema_class => 'Baseliner::Schema::Baseliner',
+    schema_class => 'Baseliner::Schema::Harvest',
     connect_info => [
-        'dbi:Oracle:POPULAR.WORLD',
+        'dbi:Oracle:SCM.WORLD',
         'uharvest',
         'uharvest',
         
@@ -22,7 +22,7 @@ See L<Baseliner>
 
 =head1 DESCRIPTION
 
-L<Catalyst::Model::DBIC::Schema> Model using schema L<Baseliner::Schema::Baseliner>
+L<Catalyst::Model::DBIC::Schema> Model using schema L<Baseliner::Schema::Harvest>
 
 =head1 AUTHOR
 

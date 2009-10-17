@@ -1,0 +1,46 @@
+<%args>
+    $row 
+</%args>
+
+                    xtype: "combo",
+                    editable: "false",
+                    forceSelection: "true",
+                    mode: "local",
+                    triggerAction: "all",
+                    value: "/",
+                    allowBlank: false,
+                    valueField: "value",
+                    displayField: "text",
+                    hiddenName: 'ns',     
+                    listWidth:300,
+                    width:300,
+                    lazyRender: true,
+                    listClass: "x-combo-list-small",
+                    store: new Ext.data.SimpleStore({
+					    fields: ['value', 'text'],
+					    data :  <% js_dumper $c->stash->{namespaces} %>
+
+					}),
+                    listeners: {select:{fn:function(combo, value) {
+                    	var nsUrl = '<% $row->{url} %>?'; //ok
+                    	var pPanelForm = combo.findParentByType('form');
+                    	var parentForm = pPanelForm.getForm();
+                    	var frmItems = parentForm.items.items;
+                    	for(var i=0; i < frmItems.length; i++){  
+                    		if(frmItems[i].name!=undefined && frmItems[i].value!=undefined){
+                    			nsUrl = nsUrl +frmItems[i].name + '=' + frmItems[i].value + '&';
+                    		}
+                    	}
+                    	parentForm.load({url:nsUrl
+% if  ($row->{reloadChildren}) {
+						,success: function(form,action){
+							var pComponents = pPanelForm.findByType(Ext.grid.GridPanel);
+							for(var i=0;i < pComponents.length;i++){	
+								if(pComponents[i].store != null){								
+									pComponents[i].store.load();
+								}					
+							}
+						}
+% }                   	
+                    	});
+                    }}},		

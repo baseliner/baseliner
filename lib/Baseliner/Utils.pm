@@ -1,5 +1,6 @@
 package Baseliner::Utils;
 
+
 =head1 DESCRIPTION
 
 Some utilities shared by different Baseliner modules and plugins.
@@ -10,9 +11,11 @@ use Exporter::Tidy default => [
     qw/_loc _loc_raw _cut _log _debug _utf8 _tz slashFwd slashBack slashSingle
     _unique _throw say _say _now _now_ora _nowstamp parse_date parse_dt
     _parse_template
+	_get_options
+    _decode_json
     _notify_address
     is_oracle
-    _dump _load
+    _dump _load _trim
     _array
     ns_match ns_split domain_match
     packages_that_do 
@@ -22,11 +25,13 @@ use FindBin '$Bin';
 use Locale::Maketext::Simple (
 			Style => 'gettext',
 			Path => $Bin.'/../lib/Baseliner/I18N',
-			Decode => 0,
+			Decode => 1,
 		);
 use Carp;
 use DateTime;
 use YAML::Syck;
+use List::MoreUtils qw(:all);
+use Try::Tiny;
 use Class::MOP;
 use Sys::Hostname;
 use PadWalker qw(peek_my peek_our peek_sub closed_over);
@@ -105,22 +110,32 @@ sub _dump {
 use Encode qw( decode_utf8 encode_utf8 is_utf8 );
 sub _loc {
     return unless $_[0];
-    return loc( @_ );
+    #return loc( @_ );
+	my @args = @_;
     my $context = peek_my(1); ## try to get $c with PadWalker
     if( $context->{'$c'} && ref ${ $context->{'$c'} } ) {
-        my $c = ${ $context->{'$c'} };
-        my $msg = $c->localize( @_ );
-        #return _utf8($msg);
-        return $msg;
+		try {
+			my $c = ${ $context->{'$c'} };
+			return loc(@args) if $c->commandline_mode;
+			return loc(@args) unless defined $c->request;
+			if( ref $c->session->{user} ) {
+				$c->languages( $c->session->{user}->languages );
+			}
+			return $c->localize( @args );
+		} catch {
+			return loc(@args);
+		};
     } else {
-        my $msg = loc( @_ );
-        #return _utf8($msg);
-        return $msg;
+        return loc( @args );
     }
 }
 
 sub _loc_raw {
     return loc( @_ );
+}
+
+sub _loc_decoded {
+    return _utf8( _loc(@_) );
 }
 
 sub _utf8 {
@@ -129,8 +144,16 @@ sub _utf8 {
 }
 
 sub _log {
+	return unless any { $_ } @_;
     my ($cl,$fi,$li) = caller() || '*';
 	print STDERR ( _now()." [$cl $$] - ", @_, "\n" );
+}
+
+use JSON::XS;
+sub _decode_json {
+    my $data = shift;
+    $data = encode_utf8($data) if is_utf8($data);
+    return decode_json($data); 
 }
 
 #TODO check that global DEBUG flag is active
@@ -142,7 +165,8 @@ sub _debug {
 sub _throw {
 	#Carp::confess(@_);
 	#die join('', @_ , "\n");
-    Catalyst::Exception->throw( @_ );
+    #Catalyst::Exception->throw( @_ );
+	Carp::croak @_;
 }
 
 sub say {
@@ -233,8 +257,10 @@ sub packages_that_do {
     my %cl=Class::MOP::get_all_metaclasses;
     for my $package ( grep !/::Role/, grep /^Baseliner/, keys %cl ) {
         my $meta = Class::MOP::get_metaclass_by_name($package);
-        push @packages, $package
-            if( $meta->isa('Moose::Meta::Class') && $meta->does( $role ) );
+		eval {
+			push @packages, $package
+				if( $meta->isa('Moose::Meta::Class') && $meta->does( $role ) );
+		};
     }
     return @packages;
 }
@@ -256,6 +282,13 @@ sub _array {
 
 sub is_oracle {
     return Baseliner->model('Baseliner')->storage->dbh->{Driver}->{Name} =~ m/oracle/i;
+}
+
+sub _trim {
+	my $str = shift;
+	$str =~ s{^\s*}{}g;
+	$str =~ s{\s*$}{}g;
+	return $str;
 }
 
 use Text::Template;
@@ -280,6 +313,26 @@ sub _notify_address {
     my $host = Baseliner->config->{host} || lc(Sys::Hostname::hostname);
     my $port = $ENV{BASELINER_PORT} || $ENV{CATALYST_PORT} || 3000;
     return "http://$host:$port";
+}
+
+sub _get_options {
+    my ( $last_opt, %hash );
+    for (@_) {
+        if (/^-+(.*)/) {
+            $last_opt = $1;
+            $hash{$last_opt} = [] unless ref $hash{$last_opt};
+        }
+        else {
+            push @{ $hash{$last_opt} }, Encode::encode_utf8($_);
+        }
+    }
+	# single option => scalar
+	for( keys %hash ) {
+		if( @{ $hash{$_} } == 1 ) {
+			$hash{$_} = $hash{$_}->[0];	
+		}
+	}
+    return %hash;
 }
 
 1;

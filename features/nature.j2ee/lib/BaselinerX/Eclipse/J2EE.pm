@@ -267,7 +267,7 @@ sub getChildren {
     my %RET  = ();
     push @DEPS, $self->verifyClasspathJ2EE(@_);
     push @DEPS, $self->verifyDepJ2EE(@_);
-    ##TODO: un EAR además tiene sus modulemaps...
+    ##TODO: un EAR ademÃ¡s tiene sus modulemaps...
     @RET{@DEPS} = ();
     return keys %RET;
 }
@@ -378,6 +378,7 @@ sub getBuildXML {
     $P{war_include} = '' if !exists $P{war_include};
     $P{jar_include} = '' if !exists $P{jar_include};
     $P{tar_include} = '' if !exists $P{tar_include};
+	ref $P{variables} or $P{variables} = {};
     $P{static_exclude} = '';
     $P{static_include} = '';
 
@@ -496,7 +497,7 @@ sub getBuildXML {
               if -e $self->{DIR} . "/$earhome/lib";
             ## EAR
             my $earfile        = $W{$earprj}{deployName} . ".ear";
-            ## Evitar extensión duplicada (Popular)
+            ## Evitar extensiÃ³n duplicada (Popular)
             $earfile =~ s/\.ear\.ear/\.ear/g;
             
            
@@ -505,7 +506,7 @@ sub getBuildXML {
             ## en el banco se nombra a los proyectos que contienen el aplicacion.xml como 
             ## NombreProyecto.ear, al intentar crear el ear en el workspace ant devuelve un error ya que
             ## encuentra NombreProyecto.ear como una carpeta y al existir no deja crear el ear.
-            my $outputPath = $self->{opts}->{j2ee_build_config}->{build_path};
+            my $outputPath = $P{j2ee_build_config}->{build_path};
 
             $self->{build}{target}{package}{$group} .= qq{
                                              <mkdir dir="$outputPath" />            	
@@ -676,7 +677,7 @@ qq{Error while trying to define the compile strategy for project %1:\nMissing .c
                       };
       
        #Cargamos todos los classpaths
-        my $cps = $self->{opts}->{j2ee_build_config}->{classpath};
+        my $cps = $P{j2ee_build_config}->{classpath};
         my @classPaths = split(';',$cps);
         
         for my $classpath (@classPaths){
@@ -697,8 +698,8 @@ qq{Error while trying to define the compile strategy for project %1:\nMissing .c
                                              </fileset>
                       };
                              
-        #Se cargan las librerias del WAS
-        my $was_lib = $self->{opts}->{j2ee_build_config}->{was_lib};
+        #Se cargan las librerias del WAS "
+        my $was_lib = $P{j2ee_build_config}->{was_lib};
         $self->{build}{target}{build}{$group} .= qq{
                                              <fileset dir="$was_lib">
                                                          <include name="**/*.jar"/>
@@ -715,6 +716,26 @@ qq{Error while trying to define the compile strategy for project %1:\nMissing .c
                 $self->{build}{classpathlibs}{$group}{$_} = ();
             }
         }
+
+        ## .classpath user libs (USER_LIBRARY)
+        if ( ref $W{$prj}{classpath}{userlib} ) {
+            foreach my $path ( @{ $W{$prj}{classpath}{userlib} || [] } ) {
+				my $var = $P{variables}->{'org.eclipse.jdt.USER_LIBRARY'};
+				if( $var && $path =~ s{org.eclipse.jdt.USER_LIBRARY}{$var}g ) {
+					#$self->{build}{classpathlibs}{$group}{$path} = ();
+						$self->{build}{target}{build}{$group} .= qq{
+										<classpath>
+                                             <fileset dir="$path">
+                                                         <include name="**/*.jar"/>
+                                             </fileset>
+										</classpath>
+						};
+				} else {
+					die 'No value assigned to variable org.eclipse.jdt.USER_LIBRARY found in .classpath';
+				}
+            }
+        }
+
         ## MANIFEST.MF Class-Path libs
         if ( ref $W{$prj}{classpath}{manifestlib} && $P{earprj} ) {
             foreach ( @{ $W{$prj}{classpath}{manifestlib} } ) {
@@ -1037,16 +1058,13 @@ sub parse {
                   );
             }
             ## also tells me if I'm a WEB project
-            for ( ${ $W{$prj}{".classpath"}{xml} }
-                ->{classpath}{classpathentry}( 'kind', 'eq', 'con' ) )
-            {
-                if ( $_->{path} eq
-                    'org.eclipse.jst.j2ee.internal.web.container' )
-                {
-                    $W{$prj}{WEB} =
-                      'org.eclipse.jst.j2ee.internal.web.container';
-                    last;
+            for ( ${ $W{$prj}{".classpath"}{xml} }->{classpath}{classpathentry}( 'kind', 'eq', 'con' ) ) {
+                if ( $_->{path} eq 'org.eclipse.jst.j2ee.internal.web.container' ) {
+                    $W{$prj}{WEB} = 'org.eclipse.jst.j2ee.internal.web.container';
                 }
+				elsif( $_->{path} =~ /USER.LIBRARY/ ) {
+					push @{ $W{$prj}{classpath}{userlib} } , $_->{path};
+				}
             }
         }
         ## WEB settings

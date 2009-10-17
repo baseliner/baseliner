@@ -4,6 +4,8 @@ use Baseliner::Utils;
 use DateTime;
 use YAML;
 
+with 'Baseliner::Role::Service';
+
 BEGIN { 
     ## Oracle needs this
     $ENV{'NLS_DATE_FORMAT'} = 'YYYY-MM-DD HH24:MI:SS';
@@ -20,6 +22,7 @@ register 'config.job' => {
 		{ id=>'jobid', label => 'Job ID', type=>'text', width=>200 },
 		{ id=>'name', label => 'Job Name', type=>'text', width=>180 },
 		{ id=>'starttime', label => 'StartDate', type=>'text', },
+		{ id=>'username', label => 'Create', type=>'text', },
 		{ id=>'maxstarttime', label => 'MaxStartDate', type=>'text', },
 		{ id=>'endtime', label => 'EndDate', type=>'text' },
 		{ id=>'status', label => 'Status', type=>'text', default=>'READY' },
@@ -49,7 +52,7 @@ register 'service.job.new' => {
 	config => 'config.job',
 	handler => sub {
         my ($self, $c, $config) = @_;
-        $c->model('Jobs')->create_job( $config );
+        $c->model('Jobs')->create( $config );
     }
 };
 

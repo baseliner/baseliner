@@ -55,9 +55,11 @@ All data is compressed.
 =cut
 sub common_log {
 	my ( $lev, $self, $text )=( shift, shift, shift);
+    my ($package, $filename, $line) = caller 1;
+    my $module = "$package - $filename ($line)";
     my %p = ( 1 == scalar @_ ) ? ( data=>shift ) : @_; # if it's only a single param, its a data, otherwise expect param=>value,...  
     $text = substr( $text, 0, 2048 );
-	my $row = Baseliner->model('Baseliner::BaliLog')->create({ id_job =>$self->jobid, text=> $text, lev=>$lev   }); 
+	my $row = Baseliner->model('Baseliner::BaliLog')->create({ id_job =>$self->jobid, text=> $text, lev=>$lev, module=>$module   }); 
 	$p{data} && $row->data( compress $p{data} );  ##TODO even with compression, too much data breaks around here - use dbh directly?
 	defined $p{more} && $row->more( $p{more} );
 	$p{data_name} && $row->data_name( $p{data_name} );

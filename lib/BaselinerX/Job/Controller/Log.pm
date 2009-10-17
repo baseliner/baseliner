@@ -33,23 +33,27 @@ sub logs_json : Path('/job/log/json') {
                 });
 	while( my $r = $rs->next ) {
         my $data = uncompress( $r->data ) || $r->data;
-        next if( $query && !query_array($query, $r->job->name, $r->get_column('ts'), $r->text, $r->provider, $r->lev, $r->data_name, $data, $r->ns ));
+        next if( $query && !query_array($query, $r->job->name, $r->get_column('timestamp'), $r->text, $r->provider, $r->lev, $r->data_name, $data, $r->ns ));
         if( $filter ) {
            next if defined($filter->{$r->lev}) && !$filter->{$r->lev};
         }
         my $data_len = length( $data || '' ) ;
         my $more = $r->more;
         my $data_name = $r->data_name || ''; 
-
-        my $file = ( $data_len > ( 4 * 1024 ) ) ? $data_name . ".txt" : '';
+        my $file = $data_name =~ m/\.\w+$/
+            ? $data_name
+            : ( $data_len > ( 4 * 1024 ) )
+                ? $data_name . ".txt"
+                : '';
         push @rows,
           {
             id       => $r->id,
             id_job   => $r->id_job,
             job      => $r->job->name,
             text     => $r->text,
-            ts       => $r->get_column('ts'),
+            ts       => $r->get_column('timestamp'),
             lev      => $r->lev,
+            module   => $r->module,
             ns       => $r->ns,
             provider => $r->provider,
             more     => { more=>$more, data_name=> $r->data_name, data=> $r->data ? \1 : \0, file=>$file },

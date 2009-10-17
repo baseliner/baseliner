@@ -1,0 +1,21 @@
+<%args>
+	$root=>'data'
+	$remoteSort=>1
+	$id=>'id'
+	$url
+	$fields
+	$totalProperty=>'totalCount'
+</%args>
+<%perl>
+	use JavaScript::Dumper;
+	my $fields_str = js_dumper [ map {  { name => $_ } } @{ $fields || [] } ];
+</%perl>
+
+	var store=new Ext.data.JsonStore({
+		root: '<% $root %>' , 
+		remoteSort: <% js_dumper \$remoteSort %>,
+		totalProperty: '<% $totalProperty %>',
+		id: '<% $id %>',
+		url: '<% $url %>',
+		fields: <% $fields_str %>
+	});

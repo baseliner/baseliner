@@ -1,11 +1,8 @@
 package BaselinerX::Nature::J2EE::Controller::Deploy;
 use Baseliner::Plug;
 use Baseliner::Utils;
-use BaselinerX::Eclipse;
-use BaselinerX::Eclipse::J2EE;
-use Baseliner::Core::Filesys;
 use BaselinerX::Session::ConfigState;
-use BaselinerX::Nature::J2EE::Controller::Common;
+use BaselinerX::Nature::J2EE::Common;
 
 BEGIN { extends 'Catalyst::Controller' }
 use YAML;
@@ -53,10 +50,10 @@ sub j2ee_deploy : Path('/j2ee/deploy') {
     $c->stash->{url_submit} = '/j2ee/deploy/submit';
     $c->stash->{title} = _loc('J2EE Deploy');
  
-    $c->stash->{metadata} = $config->metadata; ## lo utilizará el config_form.mas
+    $c->stash->{metadata} = $config->metadata; ## lo utilizarÃ¡ el config_form.mas
 
 	# Rellenamos el stash para los subcomponentes de la naturaleza
-	BaselinerX::Nature::FILES::Controller::Filedist->parseStashData($c,BaselinerX::Nature::FILES::Service::Filedist->TIPO_J2EE);
+	BaselinerX::Nature::FILES::Controller::Filedist->parseStashData($c,BaselinerX::Nature::J2EE::Service::Deploy->J2EE_TIPO_EAR);
 	BaselinerX::Nature::FILES::Controller::SSHScript->parseStashData($c);
 	
     $c->stash->{template} = '/comp/j2ee_deploy.mas';
@@ -65,17 +62,7 @@ sub j2ee_deploy : Path('/j2ee/deploy') {
 
 sub list_packages : Path('/j2ee/list_packages') {
     my ( $self, $c ) = @_;
-    my @NS;
-    my @ns_list = $c->model('Namespaces')->namespaces();
-    for my $ns ( @ns_list ) {
-    	push @NS, [$ns->ns, $ns->ns_text ] 
-    			if( $ns->ns eq '/' 
-    				|| $ns->ns =~ m{^harvest.nature/J2EE}
-    				|| $ns->ns =~ m{^application}
-    				|| $ns->ns =~ m{^harvest.package}
-    			);
-    }
-    $c->stash->{namespaces} = \@NS;
+	BaselinerX::Nature::J2EE::Common->list_J2EE_namespaces($c);
 }
 
 1;
