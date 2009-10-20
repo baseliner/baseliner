@@ -1,4 +1,5 @@
 package BaselinerX::Nature::FILES::Service::Filedist;
+use utf8;
 use Baseliner::Plug;
 use Baseliner::Utils;
 use Baseliner::Core::Filesys;
@@ -10,14 +11,14 @@ use YAML::Syck;
 use constant TIPO_J2EE => "J2EE";
 use constant TIPO_FICHEROS => "FICHEROS";
 
-extends 'BaselinerX::Type::Service';
+with 'Baseliner::Role::Service';
 
 register 'config.nature.filedist' => {
           metadata=> [
                       { id=>'id', type=>'hidden' },
                       { id=>'ns', type=>'hidden' },
                       { id=>'bl', type=>'hidden' },
-                      { id=>'isrecursive', type=>'checkbox', label=>"Recursivo?",text=>'El mapeo se aplicar� de forma recursiva.',value=>1 },
+                      { id=>'isrecursive', type=>'checkbox', label=>"Recursivo?",text=>'El mapeo se aplicará de forma recursiva.',value=>1 },
                       { id=>'src_dir', label=>'Directorio Origen', type=>'text', nullable=>0, extjs =>{width=>250}  },
                       { id=>'dest_dir', label=>'Directorio Destino', type=>'text', nullable=>0, extjs =>{width=>250}  },
                       { id=>'ssh_host', label=>'usuario@host SSH', type=>'text', nullable=>0, extjs =>{width=>150}  },
@@ -50,24 +51,24 @@ register 'service.nature.filedist' => {
 					
 					my $elements = $job_stash->{elements};					
 					$elements = $elements->cut_to_subset( 'nature', 'FILES' );					
-					my @aplicaciones = $elements->list('application');
-					
-					my $config = $c->registry->get( 'config.nature.filedist' ); 
-                    $log->info("Inicio <b>distribucion de ficheros</b>") if(@aplicaciones);
-			         foreach my $aplicacion ( @aplicaciones ) {
-				            my $datos = $config->factory($c,'/application/$aplicacion',$job->bl);       
-						 	use File::Spec;
-						    my $path = $job_stash->{path}; 
-						    $path = File::Spec->catdir( $path, $aplicacion );
-						    $path = File::Spec->catdir( $path, 'FILES' );
-						    $path = File::Spec->canonpath($path);	              
-					
-							#TODO: Hay que adaptar el funcionamiento de esto al factory
-							#my $filedist = BaselinerX::Nature::FILES::Filedist->new( '/application/$aplicacion', $job->bl );    	  
-							my $filedist = BaselinerX::Nature::FILES::Filedist->new( '/application/$aplicacion', $job->bl );
+					my @applications = $elements->list('application');
+				
+	                    $log->info("Inicio <b>distribucion de ficheros</b>");
+                      	$log->debug("Aplicaciones", data=>YAML::Syck::Dump(@applications));
+				         foreach my $application ( @applications ) {
+				         	my $ns = "application/" . $application;
+							use File::Spec;
+							my $path = $job_stash->{path}; 
+							$path = File::Spec->catdir( $path, $application );
+							$path = File::Spec->catdir( $path, 'FILES' );
+							$path = File::Spec->canonpath($path);	              
+						
+							my $filedist = BaselinerX::Nature::FILES::Filedist->new( $ns, $job->bl, TIPO_FICHEROS );
 							$filedist->load($c);
-							#$filedist->distribuir($c,$path);
-			        }
+                      		$log->debug("Configuración de Ficheros <b>$ns</b>:", data=>YAML::Syck::Dump($filedist));
+							$filedist->distribuir($c,$path);
+				        }
+					
           }            
 };
 

@@ -5,15 +5,13 @@ use File::Find;
 use Error qw(:try);
 
 sub new {
-    my $class = shift();
-    my ($bl,$ns,$parentId) = @_;
+    my ($class, $bl,$ns,$parentId) = @_;
     my @scripts = ();
 
     my $self = {
         bl  => $bl,
         ns => $ns,
         parentId => $parentId,
-        scripts => @scripts,
     };
     bless( $self, $class );
 }

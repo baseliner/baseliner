@@ -2,7 +2,7 @@
       var form = new Ext.FormPanel( {
                  frame    : true,
                  width    : <% $c->stash->{width} || 350 %>,
-                 items     :  <& /comp/config_form.mas &>                 
+                 items     :  <& /comp/config/config_form.mas &>                 
              }
         );
       

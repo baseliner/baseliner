@@ -6,12 +6,13 @@ use Error qw(:try);
 
 sub new {
     my $class = shift();
-    my ($ns,$bl) = @_;
+    my ($ns,$bl,$xtype) = @_;
     my @mappings = ();
 
     my $self = {
         bl  => $bl,
         ns => $ns,
+        xtype => $xtype,
         mappings => @mappings,
     };
     bless( $self, $class );
@@ -21,7 +22,8 @@ sub load {
 	my $self = shift();
 	my $c = shift();
 	my @mappings = ();
-	my $rs = $c->model('Baseliner::BaliFileDist')->search();
+	my $rs = $c->model('Baseliner::BaliFileDist')->search({ xtype=>$self->{xtype} });
+	
 	while(my $r = $rs->next){
 	    my $row = { $r->get_columns };
 		push @mappings, { 
@@ -93,8 +95,9 @@ sub distribuir{
 		my $filename = "tarfile_dist_$mapeo->{id}.tar";	
 		my $empaquetado = 1;
 		for my $filtro (@filtros){
-			my $tarflags = (-e "$origen/$filename")?"uvf":"cvf";
-			my $command = "cd $origen ; find . -name \"$filtro\" -type f $opts | xargs tar $tarflags $origen/$filename";
+			#my $tarflags = (-e "$origen/$filename")?"uvf":"cvf";
+			my $tarflags = "rvf";
+			my $command = "cd $origen ; mkdir empty; tar cvf $origen/$filename empty; find . -name \"$filtro\" -type f $opts -exec tar $tarflags $origen/$filename {} \\;";
 			if(system($command)!=0){
 				$log->warn("Fallo al empaquetar el mapeo $mapeo (Es posible que la ruta no exista para esta naturaleza).", data=> "Comando: $command\nError=$?");
 				$empaquetado = 0;
@@ -139,7 +142,7 @@ sub distribuir{
 			die("No es posible desempaquetar $distribucion->{fichero}.");	
 		} 			
 
-		($rc,$ret) = $fs_remoto->execute(qq{cd $distribucion->{dir_destino}; rm $distribucion->{fichero}});
+		($rc,$ret) = $fs_remoto->execute(qq{cd $distribucion->{dir_destino}; rm $distribucion->{fichero}; rm -r empty;});
 		$log->warn("No he podido eliminar el paquete temporal $distribucion->{dir_destino}/$distribucion->{fichero}, debera borrarse de forma manual.", data=>$ret) if($rc!=0);
 		
 		$fs_remoto->end();

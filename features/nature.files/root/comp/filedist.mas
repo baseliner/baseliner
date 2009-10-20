@@ -111,7 +111,7 @@
             	getFormFileDist().getForm().loadRecord(selectedRecord);
             	//var hiddens = getFormFileDist().findByType('hidden');
             	//for(var x=0;x < hiddens.length;x++)hiddens[x].fireEvent('change',null);
-                //añadir al grid y submit
+                //aï¿½adir al grid y submit
                 win.show();
             }},
                         
@@ -149,11 +149,11 @@
                  border    : false,
                  frame		: true,
                  url      : '<% $c->stash->{url_filedist_submit} %>',
-                 items     :  <& /comp/config_form.mas, metadataKey => 'metadata_filedist' &>
+                 items     :  <& /comp/config/config_form.mas, metadataKey => 'metadata_filedist' &>
              }
         );      
         
-		//creamos la ventana que contendrá el formulario  
+		//creamos la ventana que contendrï¿½ el formulario  
 		var win = new Ext.Window({  
 		    title: 'Nuevo mapeo de ficheros',  
 		    width:450,  

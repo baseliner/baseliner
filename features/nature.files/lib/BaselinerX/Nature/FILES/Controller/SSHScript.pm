@@ -64,7 +64,7 @@ sub parseStashData{
     
     $c->stash->{title_script} = _loc('Ejecucion de Scripts');
 
-    $c->stash->{metadata_sshscript} = $config->metadata; ## lo utilizar· el config_form.mas    
+    $c->stash->{metadata_sshscript} = $config->metadata; ## lo utilizar√° el config_form.mas    
     
 }
 

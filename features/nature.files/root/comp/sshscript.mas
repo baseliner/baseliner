@@ -125,7 +125,7 @@
             	win.setTitle('Editar mapeo seleccionado');
             	var selectedRecord = grid.getSelectionModel().getSelected();
             	getFormScripts().getForm().loadRecord(selectedRecord);
-                //añadir al grid y submit
+                //aï¿½adir al grid y submit
                 win.show();
             }},
                         
@@ -162,11 +162,11 @@
                  border    : false,
                  frame		: true,
                  url      : '<% $c->stash->{url_script_submit} %>',
-                 items     : <& /comp/config_form.mas, metadataKey => 'metadata_sshscript' &>
+                 items     : <& /comp/config/config_form.mas, metadataKey => 'metadata_sshscript' &>
              }
         );      
         
-		//creamos la ventana que contendrá el formulario  
+		//creamos la ventana que contendrï¿½ el formulario  
 		var win = new Ext.Window({  
 		    title: 'Nuevo Script',  
 		    width:450,  

@@ -13,8 +13,13 @@ sub filedist_json : Path('/filedist/json') {
     my ( $self, $c ) = @_;
     
     	  my ($ns,$bl) =  BaselinerX::Session::ConfigState->getConfigState($c);
-    	      
-    	  my $filedist = BaselinerX::Nature::FILES::Filedist->new( $ns, $bl );
+		  my $p = $c->request->parameters;
+			
+		  my $tipo = ($p->{tipo}) ? $p->{tipo}: BaselinerX::Nature::FILES::Service::Filedist->TIPO_FICHEROS; 
+			
+		warn "--------TIPO DISTRO: " . $tipo;
+
+    	  my $filedist = BaselinerX::Nature::FILES::Filedist->new( $ns, $bl, $tipo );
     	  
 		  $filedist->load($c);
 		  
@@ -69,10 +74,9 @@ sub filedist : Path('/filedist') {
 	$c->forward('/baseline/load_baselines');
 	
  
-    $c->stash->{metadata} = $config->metadata; ## lo utilizar· el config_form.mas
-	
+    $c->stash->{metadata} = $config->metadata; ## lo utilizar√° el config_form.mas
 
-	$self->parseStashData($c,BaselinerX::Nature::FILES::Service::Filedist->TIPO_FICHEROS);
+	$self->parseStashData($c, BaselinerX::Nature::FILES::Service::Filedist->TIPO_FICHEROS);
 	BaselinerX::Nature::FILES::Controller::SSHScript->parseStashData($c);
 		
     $c->stash->{template} = '/comp/filedist_comp.mas';
@@ -84,13 +88,13 @@ sub parseStashData{
    
 	my ($ns,$bl) =  BaselinerX::Session::ConfigState->getConfigState($c);
     	  
-    $c->stash->{url_filedist_store} = '/filedist/json?ns='. $ns . '&bl=' . $bl;
+    $c->stash->{url_filedist_store} = '/filedist/json?ns='. $ns . '&bl=' . $bl . "&tipo=" . $tipo;
     $c->stash->{url_filedist_submit} = '/filedist/submit';
     $c->stash->{url_filedist_delete} = '/filedist/delete';
     
     $c->stash->{title} = _loc('Distribucion Ficheros');
 
-    $c->stash->{metadata_filedist} = $config->metadata; ## lo utilizar· el config_form.mas
+    $c->stash->{metadata_filedist} = $config->metadata; ## lo utilizar√° el config_form.mas
     
 }
 
