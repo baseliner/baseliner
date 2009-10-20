@@ -44,7 +44,7 @@ sub run {
 	my $bl = $job->bl;
 	my $job_type = $job->job_type;
 
-	unless( $job_type eq 'promote' ) {
+	unless( $job_type =~ m/promote|demote|rollback/ ) {
 		$log->debug( _loc('No transition for job type "%1"', $job_type ) );
 		return;
 	}
@@ -104,7 +104,7 @@ sub find_to_state {
 	my $state = $p{state};
 	my $job_type = $p{job_type};
 	my $to_state;
-	$job_type='promote' if $job_type eq 'normal';
+	#$job_type='promote' if $job_type eq 'normal';
 	$job_type='demote' if $job_type eq 'rollback';
 	try {
 		$to_state = $to_state_map{$job_type}{$bl};

@@ -102,13 +102,15 @@ sub xml_to_extjs : Private {
 	my %kkey;
 	# get current data
 	( my $table = $xml->{harvest_form}->{dbtable} .'' )=~ s/(_|^)(.)/\U$2/g;
-	my $row = $c->model( 'Harvest::' . $table )->search({ formobjid=>$c->req->params->{ID} })->first;
+	my $formobjid = $c->req->params->{ID};
+	my $row = $c->model( 'Harvest::' . $table )->search({ formobjid=>$formobjid })->first;
+	ref $row or Catalyst::Exception->throw( _loc 'Could not find formobjid %1 in table %2', $formobjid, $table );
 	# prepare form
 	my $form = {};
 	$form->{url} = '/scm/form_submit';
 	$form->{frame} = \0;
 	$form->{method} = 'post';
-	push @meta, { xtype=>'hidden', name=>'formobjid', value=>$c->req->params->{ID} };
+	push @meta, { xtype=>'hidden', name=>'formobjid', value=>$formobjid };
 	for my $key (  $xml->{harvest_form}->order  ) {
 		if( grep( /$key/, qw/combobox text-field date-field text-area/ ) ) {
 			my $f = $xml->{harvest_form}->{$key}[ $kkey{$key}++ ];
@@ -118,6 +120,7 @@ sub xml_to_extjs : Private {
 			$item->{xtype} = $ext_map{$key};
 			$item->{id} = "$f->{dbfield}";
 			$item->{name} = "$f->{dbfield}";
+			$item->{height} = 150 if $item->{xtype} eq 'textarea';
 			$item->{fieldLabel} = "$f->{label}";
 			$item->{size} = "$f->{maxsize}" if( $key =~ /text-field/ );
 			$item->{anchor} = "80%" if(  $key =~ /text-area/ );
@@ -144,6 +147,16 @@ sub xml_to_extjs : Private {
 				$item->{mode} = 'local';
 			}
 			push @meta, $item; 
+		} elsif( lc($key) eq 'baseliner-tab' ) {
+warn '>>>>>>>>>>>>>>>>' . _dump $xml->{harvest_form}->{$key};
+			foreach my $tab ( _array $xml->{harvest_form}->{$key} ) {
+				# not a field, but a new Baseliner tab component
+				push @{ $c->stash->{form_tabs} }, { 
+					type  => $tab->{type},
+					title => $tab->{title},
+					url   => $tab->{url},
+				};
+			}
 		} else {
 			my $value = $xml->{harvest_form}->{$key} . "";
 			push @meta, { xtype=>'hidden', name=>$key, value=>$value  };
@@ -161,8 +174,12 @@ sub form_meta : Path('/scm/servlet/harweb.Form') {
 	my ($self,$c)=@_;
     my $p = $c->req->params;
     my $user;
-    my $username;
+
+	#TODO check for referer 'harvest'
+	my $username = decode_base64($p->{USER_NAME});
+	$c->stash->{username} = $username;
     $c->forward('/auth/login_from_url');
+
     if( defined $c->user ) {
         $c->forward( 'xml_to_extjs' );
         $c->stash->{title} = $c->req->params->{PACKAGE_NAME} || 'Harvest Form';

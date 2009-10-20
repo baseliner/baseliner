@@ -40,7 +40,9 @@ sub run {
 		$item;
 	} _array( $p->{package} ); 
 
-	my $job_type = $p->{job_type} || $p->{to_state} ? 'promote' : 'normal';
+	my $job_type = $p->{job_type};
+	_throw "Parameter --to_state needs a --job_type of either 'promote' or 'demote'" 
+		if( $p->{to_state} && $job_type !~ m/promote|demote/ );
 	#_log _dump \@contents;
     my $job = $c->model('Model::Jobs')->create(
         bl       => $bl,
@@ -59,7 +61,7 @@ sub run {
 	$job->stash( _dump $stash );
 	$job->update;
 
-	print _loc( "Created job %1 ok.", $job->name );
+	print _loc( "Created job %1 of type %2 ok.", $job->name, $job->type );
 }
 
 =head1 USAGE
