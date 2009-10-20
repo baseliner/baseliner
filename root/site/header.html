@@ -95,7 +95,11 @@ Ext.onReady(function(){
 
     // Check open tab
 % foreach my $tab ( @{ $c->stash->{tab_list} || [] } ) {
-    Baseliner.addNewTabComp('<% $tab->{url} %>');
+%    if( $tab->{type} eq 'page' ) {
+		Baseliner.addNewTab('<% $tab->{url} %>');
+%    } else {
+		Baseliner.addNewTabComp('<% $tab->{url} %>');
+%    }
 % }
 
 % foreach my $tab ( _array $c->stash->{alert} ) {

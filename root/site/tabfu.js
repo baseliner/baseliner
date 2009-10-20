@@ -139,18 +139,20 @@
 	};
 
 	//adds a new object to a tab 
-	Baseliner.addNewTabItem = function( comp, title ) {
+	Baseliner.addNewTabItem = function( comp, title, params ) {
+		if( params == undefined ) params = { active: true };
 		var tabpanel = Ext.getCmp('main-panel');
 		var tab = tabpanel.add(comp);
-        if( title == undefined )
+        if( title == undefined || title=='' )
             title = comp.title;
 		tab.setTitle( title );
-		tabpanel.setActiveTab(comp);
+		if( params.active==undefined ) params.active=true;
+		if( params.active ) tabpanel.setActiveTab(comp);
         return tab.getId();
 	};
 
 	//adds a new fragment component with html or <script>...</script>
-	Baseliner.addNewTab = function(purl, ptitle){
+	Baseliner.addNewTab = function(purl, ptitle, params ){
 			var tab = Ext.getCmp('main-panel').add({ 
 					xtype: 'panel', 
 					layout: 'fit', 
@@ -182,9 +184,9 @@
     };
 
 	//adds a new tab from a function() type component
-	Baseliner.addNewTabComp = function( comp_url, ptitle ){
+	Baseliner.addNewTabComp = function( comp_url, ptitle, params ){
         Baseliner.ajaxEval( comp_url, { }, function(comp) {
-            var id = Baseliner.addNewTabItem( comp, ptitle );
+            var id = Baseliner.addNewTabItem( comp, ptitle, params );
             Baseliner.tabInfo[id] = { url: comp_url, title: ptitle, type: 'comp' };
         });
 	};
@@ -276,8 +278,10 @@
 
     };
 	Baseliner.formSubmit = function( form ) {
+			var title = form.title;
+			if( title == undefined || title == '' ) title = '<% _loc("Submit") %>';
 			form.submit({
-				success: function(f,a){ Ext.Msg.alert('<% _loc('Success') %>', 'Datos actualizados con exito.'); },
+				success: function(f,a){ Baseliner.message( title , 'Datos actualizados con exito.'); },
 				failure: function(f,a){ 
 					// OSCAR: He cambiado los mensajes de error para que soporten validaciones..
 					switch (a.failureType) {

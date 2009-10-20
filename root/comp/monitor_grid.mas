@@ -34,13 +34,15 @@
 	};
     Baseliner.levRenderer = function(value,metadata,rec,rowIndex,colIndex,store) {
         var icon;
+		var bold = false;
 		var status = rec.data.status_code;
-        if( status=='RUNNING' ) icon='log_d.gif';
+        if( status=='RUNNING' ) { icon='gears.gif'; bold=true }
+        else if( status=='READY' ) icon='log_d.gif';
         else if( status=='FINISHED' ) icon='log_i.gif';
         else if( status=='IN-EDIT' ) icon='log_w.gif';
         else icon='log_e.gif';
         if( icon!=undefined ) {
-            return "<img alt='"+status+"' border=0 src='/static/images/"+icon+"' />" + value ;
+            return "<img alt='"+status+"' border=0 src='/static/images/"+icon+"' />" + (bold?'<b>':'') + value + (bold?'</b>':'') ;
         } else {
             return value;
         }
@@ -52,7 +54,7 @@
 
 		// create the grid
 		var grid = new Ext.grid.GridPanel({
-			title: '<% _loc('Job Monitor') %>',
+			title: '<% _loc('Monitor') %>',
 			header: false,
             stripeRows: true,
 			autoScroll: true,
