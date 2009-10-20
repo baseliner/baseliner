@@ -65,7 +65,7 @@ sub grant_role {
     my ($self, %p ) = @_;
 
     $p{ns} ||= '/';
-    $p{bl} ||= '*';
+    $p{bl} ||= '*';  #TODO not used here
 
     my $role = Baseliner->model('Baseliner::BaliRole')->search({ role=>$p{role} })->first;
     unless( ref $role ) {

@@ -660,6 +660,12 @@ msgstr "Finalizado"
 
 # Job Types
 
+msgid "normal"
+msgstr "Normal"
+
+msgid "static"
+msgstr "Estático"
+
 msgid "promote"
 msgstr "Promoción"
 
