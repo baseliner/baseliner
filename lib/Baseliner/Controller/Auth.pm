@@ -10,15 +10,18 @@ use Baseliner::Core::User;
 sub login_from_url : Local {
     my ( $self, $c ) = @_;
     my $p = $c->req->params;
-    if( $p->{USER_NAME} ) {  #TODO check for referer 'harvest'
-		my $username = decode_base64($p->{USER_NAME});
+	my $username = $c->stash->{username};
+    if( $username ) {  
 		try {
+			die if $c->config->{ldap} eq 'no';
 			$c->authenticate({ id=>$username }, 'ldap_no_pw');
 			$c->session->{user} = new Baseliner::Core::User( user=>$c->user, username=>$username );
 		} catch {
 			# failed to find ldap, just let him in
-			$c->session->{user} = new Baseliner::Core::User( username=>$username );
-			$c->forward( '/auth/login_local' );
+			my $err = shift;
+			_log $err;
+			$c->authenticate({ id=>$username }, 'none');
+			$c->session->{user} = new Baseliner::Core::User( user=>$c->user, username=>$username );
 		};
     }
     if( ref $c->user ) {

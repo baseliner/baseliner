@@ -46,7 +46,7 @@ msgid "POST"
 msgstr "Post-Ejecución"
 
 msgid "END"
-msgstr "Detenido"
+msgstr "Completado"
 
 msgid "Preferences"
 msgstr "Preferencias"
