@@ -3,14 +3,28 @@ notest install Catalyst::Devel
 notest install DBIx::Class
 notest install Template
 notest install HTML::Mason
+notest install DBD::Oracle
+notest install SOAP::Lite
+notest install MIME::Lite
 
+notest install XML::Smart
+notest install Net::Daemon
+notest install Getopt::Lucid
+notest install Proc::Exists
+notest install Config::JFDI
+notest install Class::Singleton
+notest install Text::CSV_XS
+
+notest install Catalyst::Plugin::StackTrace
+notest install Catalyst::Plugin::Unicode
 notest install Cache::FastMmap
+notest install Text:Template
 notest install Carp
 notest install Catalyst::Model::DBIC::Schema
 notest install Catalyst::View::JSON
 notest install Catalyst::View::Mason
 notest install Catalyst::View::TT
-notest install DBIx::Class
+
 notest install DBIx::Class::Schema
 notest install Data::Dumper
 notest install DateTime
@@ -18,21 +32,20 @@ notest install DateTime::Locale
 notest install DateTime::TimeZone
 notest install DateTime::Format::Natural
 notest install DateTime::Format::Strptime
+
 notest install MIME::Types
-notest install Catalyst::Plugin::Static::Simple   (requires 5.8...)
+notest install Catalyst::Plugin::Static::Simple  
 notest install Error
 notest install Exporter::Tidy 
 notest install Filesys::Virtual::SSH
 notest install PadWalker
-notest install HTML::FormFu::ExtJS
+
 notest install IO::Socket
 notest install JSON::XS
 notest install JavaScript::Dumper
 notest install Locale::Maketext::Simple 
 notest install MIME::Base64
 notest install MVS::JESFTP
-notest install Moose
-notest install Moose 
 notest install Moose::Exporter
 notest install Moose::Role
 notest install MooseX::ClassAttribute
@@ -40,14 +53,22 @@ notest install Net::SCP
 notest install Package::Alias 
 notest install Path::Class::Dir 
 notest install Proc::Background
-notest install SOAP::Lite
-notest install Switch Perl6
+
+
 notest install Text::Template
-#notest install TheSchwartz::Moosified
-notest install XML::Smart
 notest install YAML
+notest install YAML::Syck
+notest install Graph
 notest install Class::C3::XS
+
+notest install DateTime::Format::DateParse
+notest install Perl::Tags
+notest install Catalyst::Component::ACCEPT_CONTEXT
+notest install Graph
+notest install YAML::Syck
+
 notest install Catalyst::Plugin::Authentication
+notest install Catalyst::Plugin::Authentication::Store::LDAP
 notest install Net::LDAP
 notest install Proc::Exists
 notest install Catalyst::Authentication::Store::LDAP
@@ -59,8 +80,10 @@ notest install Catalyst::View::Mason
 notest install Catalyst::View::JSON
 notest install Catalyst::View::TT
 notest install Catalyst::Controller::POD
+
 notest install Compress::Raw::Zlib
 notest install Compress::Zlib
+
 notest install MooseX::MethodAttributes
 notest install Class::Accessor::Grouped
 notest install Class::C3::Componentised
@@ -70,22 +93,25 @@ notest install Catalyst::Plugin::Session
 notest install Catalyst::Plugin::Session::Store::File
 notest install Catalyst::Plugin::Session::State::Cookie
 notest install Catalyst::Plugin::Singleton
-notest install Catalyst::Plugin::Server::XMLRPC
-notest install Catalyst::Plugin::CommandLine
 notest install Catalyst::Plugin::ConfigLoader
+notest install Catalyst::Authentication::Store::LDAP
 
+notest install Catalyst::Engine::HTTP::Prefork
 
-notest install Catalyst::Helper::Model::DBIC
 notest install Catalyst::Helper::View::TTSite
 notest install Catalyst::Helper::Firebug
 notest install Catalyst::Helper::View::JSON
-notest install Catalyst::Helper::Model::XMLRPC
+notest install Catalyst::View::Mason
 notest install DBIx::Class::Schema::Loader
 notest install Catalyst::Model::DBIC::Schema
 
+notest install Calendar::Slots
+notest install CatalystX::Features
+notest install Crypt::Blowfish::Mod
+notest install Config::INI::Writer
 
-notest install SQL::Abstract::Limit
 notest install SQL::Abstract
+notest install SQL::Abstract::Limit
 notest install Class::C3::Componentised
 notest install Class::Accessor::Grouped
 
@@ -103,5 +129,21 @@ notest install Encode::Detect
 notest install DateTime::Format::Oracle
 notest install Data::Random
 notest install namespace::autoclean
+notest install Carp::REPL
+notest install Template::Timer
+notest install boolean
+notest install Filesys::Virtual::Plain
+notest install String::ShellQuote
+notest install File::Find::Rule
+notest install Object::MultiType
+notest install XML::LibXML
+notest install XML::Compile
+notest install XML::Compile::WSDL11
 
-
+#notest install TheSchwartz::Moosified
+#notest install Catalyst::Plugin::Server::XMLRPC
+#notest install Catalyst::Helper::Model::XMLRPC
+#notest install Catalyst::Plugin::CommandLine
+#notest install HTML::FormFu::ExtJS
+#notest install Catalyst::Helper::Model::DBIC
+#notest install Switch::Perl6
