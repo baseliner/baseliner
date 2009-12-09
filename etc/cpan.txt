@@ -14,6 +14,7 @@ notest install Proc::Exists
 notest install Config::JFDI
 notest install Class::Singleton
 notest install Text::CSV_XS
+notest install Date::Calc
 
 notest install Catalyst::Plugin::StackTrace
 notest install Catalyst::Plugin::Unicode
